@@ -11,6 +11,7 @@
       --border-color: #333;
       --accent-red: #d32f2f;
       --accent-green: #4caf50;
+      --accent-blue: #2196f3;
       --text-main: #ffffff;
       --text-muted: #aaa;
     }
@@ -88,14 +89,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
     }
     .section-home-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 6px 12px;
+      padding: 5px 10px;
       margin-bottom: 10px;
       border: 1px solid #444;
       border-radius: 8px;
@@ -103,7 +104,7 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     /* P&L Report Tabs & Styles */
@@ -140,10 +141,10 @@
       justify-content: space-between;
       align-items: center;
       background: #222225;
-      padding: 8px 10px;
+      padding: 6px 10px;
       border-radius: 6px;
-      margin-bottom: 6px;
-      font-size: 12px;
+      margin-bottom: 5px;
+      font-size: 11px;
       border: 1px solid #333;
     }
 
@@ -170,7 +171,7 @@
       padding: 16px;
     }
     .proliv-form-group { margin-bottom: 10px; }
-    .proliv-form-group label { display: block; margin-bottom: 3px; font-size: 12px; color: var(--text-muted); }
+    .proliv-form-group label { display: block; margin-bottom: 3px; font-size: 11px; color: var(--text-muted); }
     .proliv-form-group input, .proliv-form-group select, .proliv-form-group textarea {
       width: 100%;
       padding: 8px;
@@ -178,34 +179,35 @@
       border: 1px solid #444;
       background: #2a2a2e;
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       box-sizing: border-box;
     }
     .proliv-btn {
       background: var(--accent-red);
       color: white;
       border: none;
-      padding: 8px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
     }
     .proliv-btn-secondary { background: #444; }
     .proliv-btn-green { background: #2e7d32; }
+    .proliv-btn-blue { background: #1976d2; }
     .proliv-btn-danger { background: #c62828; padding: 3px 6px; font-size: 10px; }
     
-    /* Super Compact List Item for 50+ Screen View */
+    /* Ultra Compact List Item (Targeting 50+ list items per screenshot) */
     .card-item {
-      background: #252528;
-      padding: 6px 10px;
-      border-radius: 8px;
-      margin-bottom: 6px;
+      background: #222225;
+      padding: 5px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
       border: 1px solid #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
+      font-size: 11px;
     }
     .flex-row { display: flex; gap: 8px; }
     .flex-row > div { flex: 1; }
@@ -217,36 +219,36 @@
   <!-- Brand Header with Backup Options -->
   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
     <div style="display: flex; align-items: center; gap: 8px;">
-      <div style="background: var(--accent-red); width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 15px;">P</div>
-      <h2 style="margin: 0; font-size: 17px;">PROLIV PHYSIO</h2>
+      <div style="background: var(--accent-red); width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">P</div>
+      <h2 style="margin: 0; font-size: 16px;">PROLIV PHYSIO</h2>
     </div>
     <div>
-      <button class="proliv-btn" style="padding: 4px 8px; font-size: 11px;" onclick="exportBackup()">📥 Backup</button>
-      <button class="proliv-btn proliv-btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="document.getElementById('importFile').click()">📤 Restore</button>
+      <button class="proliv-btn" style="padding: 4px 8px; font-size: 10px;" onclick="exportBackup()">📥 Backup</button>
+      <button class="proliv-btn proliv-btn-secondary" style="padding: 4px 8px; font-size: 10px;" onclick="document.getElementById('importFile').click()">📤 Restore</button>
       <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(event)">
     </div>
   </div>
 
   <!-- Dashboard Overview Stats -->
   <div class="stats-grid">
-    <div class="stat-card" onclick="openPatientFilterModal('Live')"><small>Live</small><div id="statLive">0</div></div>
-    <div class="stat-card" onclick="openPatientFilterModal('All')"><small>Total</small><div id="statTotal">0</div></div>
+    <div class="stat-card" onclick="openPatientFilterModal('Live')"><small>Live Patients</small><div id="statLive">0</div></div>
+    <div class="stat-card" onclick="openPatientFilterModal('All')"><small>Total Patients</small><div id="statTotal">0</div></div>
     <div class="stat-card" onclick="openPatientFilterModal('Discharged')"><small>Discharged</small><div id="statDischarged">0</div></div>
-    <div class="stat-card" onclick="openSection('schedules-box')"><small>Schedules</small><div id="statSchedules">0</div></div>
+    <div class="stat-card" onclick="openSection('schedules-box')"><small>Rehab / Visits</small><div id="statSchedules">0</div></div>
     <div class="stat-card" onclick="openSection('fees-box')"><small>Collection</small><div id="statCollection" style="color:var(--accent-green);">₹0</div></div>
-    <div class="stat-card" onclick="openSection('fees-box')"><small>Profit</small><div id="statProfit">₹0</div></div>
+    <div class="stat-card" onclick="openSection('fees-box')"><small>Net Profit</small><div id="statProfit">₹0</div></div>
   </div>
 
   <!-- Main Navigation Grid Cards -->
   <div class="grid" id="proliv-section-navigation">
     <div class="card" onclick="openSection('patients-box')">
       <div class="card-icon">👥</div>
-      <div class="card-label">Patients List</div>
+      <div class="card-label">Patients</div>
       <div class="pill-badge" id="navPatientBadge">0</div>
     </div>
     <div class="card" onclick="openSection('schedules-box')">
       <div class="card-icon">📅</div>
-      <div class="card-label">Schedules & Visits</div>
+      <div class="card-label">Rehab & Visits</div>
       <div class="pill-badge dark" id="navScheduleBadge">0</div>
     </div>
     <div class="card" onclick="openSection('fees-box')">
@@ -260,19 +262,19 @@
   <section id="patients-box" class="section-box">
     <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
     <div class="section-header">
-      <span>PATIENTS LIST (Compact)</span>
+      <span>PATIENTS LIST (Names Only)</span>
     </div>
-    <button class="proliv-btn" style="margin-bottom: 10px; padding: 6px 10px;" onclick="openAddPatientModal()">+ Add New Patient</button>
+    <button class="proliv-btn" style="margin-bottom: 8px; padding: 5px 10px;" onclick="openAddPatientModal()">+ Add New Patient</button>
     <div id="patient-list-container"></div>
   </section>
 
-  <!-- 2. Schedules Section -->
+  <!-- 2. Rehab & Visits Section -->
   <section id="schedules-box" class="section-box">
     <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
     <div class="section-header">
-      <span>SCHEDULES & DAILY VISITS</span>
+      <span>REHAB, VISITS & DOCTOR SCHEDULES</span>
     </div>
-    <button class="proliv-btn" style="margin-bottom: 10px; padding: 6px 10px;" onclick="openAddScheduleModal()">+ Add Visit / Schedule</button>
+    <button class="proliv-btn proliv-btn-blue" style="margin-bottom: 8px; padding: 5px 10px;" onclick="openAddScheduleModal()">+ Direct Visit / Schedule</button>
     <div id="schedules-list"></div>
   </section>
 
@@ -283,8 +285,8 @@
       <span>P&L Report</span>
     </div>
     <div style="display:flex; gap:8px; margin-bottom:10px;">
-      <button class="proliv-btn proliv-btn-green" style="flex:1; padding:6px;" onclick="openAddTransactionModal()">+ Income</button>
-      <button class="proliv-btn proliv-btn-secondary" style="flex:1; padding:6px;" onclick="openAddExpenseModal()">+ Expense</button>
+      <button class="proliv-btn proliv-btn-green" style="flex:1; padding:5px;" onclick="openAddTransactionModal()">+ Income</button>
+      <button class="proliv-btn proliv-btn-secondary" style="flex:1; padding:5px;" onclick="openAddExpenseModal()">+ Expense</button>
     </div>
     <div id="fees-list"></div>
   </section>
@@ -296,17 +298,17 @@
   <div id="patientFilterModal" class="proliv-modal">
     <div class="proliv-modal-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 id="filterModalTitle" style="margin:0; font-size:15px;">Patient List</h3>
-        <button class="proliv-btn proliv-btn-secondary" style="padding:2px 8px; font-size:12px;" onclick="closeModals()">✕</button>
+        <h3 id="filterModalTitle" style="margin:0; font-size:14px;">Patient List</h3>
+        <button class="proliv-btn proliv-btn-secondary" style="padding:2px 6px; font-size:11px;" onclick="closeModals()">✕</button>
       </div>
       <div id="filteredPatientList"></div>
     </div>
   </div>
 
-  <!-- Patient Modal (Compact, no doctor/time fields here) -->
+  <!-- Add Patient Modal (Names & Primary Info Only) -->
   <div id="patientModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 id="patientModalTitle" style="margin-top:0; font-size:15px;">Patient Details</h3>
+      <h3 id="patientModalTitle" style="margin-top:0; font-size:14px;">Patient Registration</h3>
       <form id="patientForm">
         <input type="hidden" id="pId">
         <div class="proliv-form-group">
@@ -315,25 +317,9 @@
         </div>
         <div class="flex-row">
           <div class="proliv-form-group">
-            <label>Phone</label>
+            <label>Phone Number</label>
             <input type="tel" id="pPhone">
           </div>
-          <div class="proliv-form-group">
-            <label>Place</label>
-            <input type="text" id="pPlace">
-          </div>
-        </div>
-        <div class="flex-row">
-          <div class="proliv-form-group">
-            <label>Total Fee (₹)</label>
-            <input type="number" id="pFee" value="0">
-          </div>
-          <div class="proliv-form-group">
-            <label>Paid (₹)</label>
-            <input type="number" id="pPaid" value="0">
-          </div>
-        </div>
-        <div class="flex-row">
           <div class="proliv-form-group">
             <label>Status</label>
             <select id="pStatus">
@@ -341,28 +327,24 @@
               <option value="Discharged">Discharged</option>
             </select>
           </div>
-          <div class="proliv-form-group">
-            <label>Start Date</label>
-            <input type="date" id="pStartDate">
-          </div>
         </div>
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn" style="flex:1;">Save</button>
+          <button type="submit" class="proliv-btn" style="flex:1;">Save Patient</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Schedule / Daily Visit Modal (With Doctor Name & Time) -->
+  <!-- Add Rehab Visit / Schedule Modal (With Doctor, Amount & Time) -->
   <div id="scheduleModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 id="scheduleModalTitle" style="margin-top:0; font-size:15px;">Add Visit / Schedule & Doctor</h3>
+      <h3 id="scheduleModalTitle" style="margin-top:0; font-size:14px;">Add Visit, Rehab & Doctor</h3>
       <form id="scheduleForm">
         <input type="hidden" id="sId">
         <div class="proliv-form-group">
           <label>Patient Name *</label>
-          <input type="text" id="sName" placeholder="Patient Name" required>
+          <input type="text" id="sName" placeholder="Type patient name" required>
         </div>
         <div class="flex-row">
           <div class="proliv-form-group">
@@ -376,16 +358,20 @@
         </div>
         <div class="flex-row">
           <div class="proliv-form-group">
-            <label>Date</label>
+            <label>Visit Date</label>
             <input type="date" id="sDate">
           </div>
           <div class="proliv-form-group">
-            <label>Rehab / Session Notes</label>
-            <input type="text" id="sNotes" placeholder="e.g. Day 1 Session">
+            <label>Amount Charged / Paid (₹)</label>
+            <input type="number" id="sAmount" value="0">
           </div>
         </div>
+        <div class="proliv-form-group">
+          <label>Rehab Notes / Session Details</label>
+          <input type="text" id="sNotes" placeholder="e.g. Shoulder rehab - Day 2">
+        </div>
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn" style="flex:1;">Save Visit</button>
+          <button type="submit" class="proliv-btn proliv-btn-blue" style="flex:1;">Save Visit Record</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
         </div>
       </form>
@@ -395,7 +381,7 @@
   <!-- Expense Modal -->
   <div id="expenseModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 style="margin-top:0; font-size:15px;">Add Clinic Expense</h3>
+      <h3 style="margin-top:0; font-size:14px;">Add Expense</h3>
       <form id="expenseForm">
         <div class="proliv-form-group">
           <label>Title *</label>
@@ -410,7 +396,7 @@
           <input type="date" id="eDate">
         </div>
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn" style="flex:1;">Add</button>
+          <button type="submit" class="proliv-btn" style="flex:1;">Add Expense</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
         </div>
       </form>
@@ -420,10 +406,10 @@
   <!-- Income Modal -->
   <div id="transactionModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 style="margin-top:0; font-size:15px;">Add Income</h3>
+      <h3 style="margin-top:0; font-size:14px;">Add Direct Income</h3>
       <form id="transactionForm">
         <div class="proliv-form-group">
-          <label>Source *</label>
+          <label>Source / Patient Name *</label>
           <input type="text" id="tTitle" required>
         </div>
         <div class="proliv-form-group">
@@ -435,7 +421,7 @@
           <input type="date" id="tDate">
         </div>
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn proliv-btn-green" style="flex:1;">Add</button>
+          <button type="submit" class="proliv-btn proliv-btn-green" style="flex:1;">Add Income</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
         </div>
       </form>
@@ -501,6 +487,7 @@
     }
   }
 
+  // Patient Registration
   document.getElementById("patientForm").onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById("pId").value;
@@ -508,19 +495,11 @@
       id: id ? id : 'p_' + Date.now(),
       name: document.getElementById("pName").value,
       phone: document.getElementById("pPhone").value,
-      place: document.getElementById("pPlace").value,
-      fee: parseFloat(document.getElementById("pFee").value) || 0,
-      paid: parseFloat(document.getElementById("pPaid").value) || 0,
-      status: document.getElementById("pStatus").value,
-      startDate: document.getElementById("pStartDate").value
+      status: document.getElementById("pStatus").value
     };
-    const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     if (!id) {
       patients.push(patientData);
-      if(patientData.paid > 0) {
-        transactions.push({ id: 't_' + Date.now(), title: patientData.name, amount: patientData.paid, date: todayStr, type: 'income' });
-      }
     } else {
       const index = patients.findIndex(item => item.id === id);
       if(index !== -1) patients[index] = patientData;
@@ -529,19 +508,32 @@
     closeModals();
   };
 
+  // Add Visit / Schedule Handler
   document.getElementById("scheduleForm").onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById("sId").value;
+    const amountVal = parseFloat(document.getElementById("sAmount").value) || 0;
+    const pName = document.getElementById("sName").value;
+    const dateVal = document.getElementById("sDate").value || new Date().toISOString().split('T')[0];
+
     const scheduleData = {
       id: id ? id : 's_' + Date.now(),
-      name: document.getElementById("sName").value,
+      name: pName,
       doctor: document.getElementById("sDoctor").value,
       time: document.getElementById("sTime").value,
-      date: document.getElementById("sDate").value || new Date().toISOString().split('T')[0],
+      date: dateVal,
+      amount: amountVal,
       notes: document.getElementById("sNotes").value
     };
-    if (!id) schedules.push(scheduleData);
-    else {
+
+    if (!id) {
+      schedules.push(scheduleData);
+      // Auto-add paid amount to accounts collection
+      if(amountVal > 0) {
+        const formattedDate = new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        transactions.push({ id: 't_' + Date.now(), title: pName + " (Rehab Fee)", amount: amountVal, date: formattedDate, type: 'income' });
+      }
+    } else {
       const index = schedules.findIndex(item => item.id === id);
       if(index !== -1) schedules[index] = scheduleData;
     }
@@ -586,10 +578,10 @@
       listEl.innerHTML += `
         <div class="card-item">
           <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient('${p.id}');">
-            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">(📞 ${escapeHTML(p.phone || 'N/A')})</small>
+            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">(${escapeHTML(p.phone || 'No Phone')})</small>
           </div>
           <div>
-            <button class="proliv-btn" style="padding:4px 8px; font-size:11px;" onclick="closeModals(); editPatient('${p.id}');">Edit</button>
+            <button class="proliv-btn" style="padding:2px 6px; font-size:10px;" onclick="closeModals(); editPatient('${p.id}');">Edit</button>
           </div>
         </div>
       `;
@@ -598,38 +590,43 @@
   }
 
   function openAddPatientModal() {
-    document.getElementById("patientModalTitle").textContent = "Add Patient";
+    document.getElementById("patientModalTitle").textContent = "Add New Patient";
     document.getElementById("pId").value = "";
     document.getElementById("pName").value = "";
     document.getElementById("pPhone").value = "";
-    document.getElementById("pPlace").value = "";
-    document.getElementById("pFee").value = "0";
-    document.getElementById("pPaid").value = "0";
     document.getElementById("pStatus").value = "Live";
-    document.getElementById("pStartDate").value = new Date().toISOString().split('T')[0];
     document.getElementById("patientModal").style.display = "flex";
   }
 
   function editPatient(id) {
     const p = patients.find(item => item.id === id);
     if(!p) return;
-    document.getElementById("patientModalTitle").textContent = "Edit Patient";
+    document.getElementById("patientModalTitle").textContent = "Edit Patient Name";
     document.getElementById("pId").value = p.id;
     document.getElementById("pName").value = p.name || "";
     document.getElementById("pPhone").value = p.phone || "";
-    document.getElementById("pPlace").value = p.place || "";
-    document.getElementById("pFee").value = p.fee !== undefined ? p.fee : 0;
-    document.getElementById("pPaid").value = p.paid !== undefined ? p.paid : 0;
     document.getElementById("pStatus").value = p.status || "Live";
-    document.getElementById("pStartDate").value = p.startDate || "";
     document.getElementById("patientModal").style.display = "flex";
   }
 
   function deletePatient(id) {
-    if (confirm("Delete?")) {
+    if (confirm("Delete this patient?")) {
       patients = patients.filter(item => item.id !== id);
       saveData();
     }
+  }
+
+  // Opens Visit modal from Patient List directly
+  function openAddVisitForPatient(patientName) {
+    document.getElementById("scheduleModalTitle").textContent = "Add Visit / Rehab for " + patientName;
+    document.getElementById("sId").value = "";
+    document.getElementById("sName").value = patientName;
+    document.getElementById("sDoctor").value = "";
+    document.getElementById("sTime").value = "";
+    document.getElementById("sDate").value = new Date().toISOString().split('T')[0];
+    document.getElementById("sAmount").value = "0";
+    document.getElementById("sNotes").value = "";
+    document.getElementById("scheduleModal").style.display = "flex";
   }
 
   function openAddScheduleModal() {
@@ -639,6 +636,7 @@
     document.getElementById("sDoctor").value = "";
     document.getElementById("sTime").value = "";
     document.getElementById("sDate").value = new Date().toISOString().split('T')[0];
+    document.getElementById("sAmount").value = "0";
     document.getElementById("sNotes").value = "";
     document.getElementById("scheduleModal").style.display = "flex";
   }
@@ -646,18 +644,19 @@
   function editSchedule(id) {
     const s = schedules.find(item => item.id === id);
     if(!s) return;
-    document.getElementById("scheduleModalTitle").textContent = "Edit Visit / Schedule";
+    document.getElementById("scheduleModalTitle").textContent = "Edit Visit Record";
     document.getElementById("sId").value = s.id;
     document.getElementById("sName").value = s.name || "";
     document.getElementById("sDoctor").value = s.doctor || "";
     document.getElementById("sTime").value = s.time || "";
     document.getElementById("sDate").value = s.date || "";
+    document.getElementById("sAmount").value = s.amount || 0;
     document.getElementById("sNotes").value = s.notes || "";
     document.getElementById("scheduleModal").style.display = "flex";
   }
 
   function deleteSchedule(id) {
-    if (confirm("Delete?")) {
+    if (confirm("Delete this visit record?")) {
       schedules = schedules.filter(item => item.id !== id);
       saveData();
     }
@@ -704,38 +703,41 @@
   }
 
   function renderAllData() {
-    // Super Compact Patient List
+    // 1. Ultra-Compact Patient List (Names only + Quick Add Visit button)
     const pContainer = document.getElementById("patient-list-container");
-    pContainer.innerHTML = patients.length === 0 ? "<p style='color:#777; font-size:12px;'>No patients added yet.</p>" : "";
+    pContainer.innerHTML = patients.length === 0 ? "<p style='color:#777; font-size:11px;'>No patients registered.</p>" : "";
     patients.forEach((p) => {
-      let paidVal = p.paid !== undefined ? p.paid : 0;
       pContainer.innerHTML += `
         <div class="card-item">
           <div style="flex:1; cursor:pointer;" onclick="editPatient('${p.id}')">
-            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">(${escapeHTML(p.status || 'Live')})</small> 
-            <span style="color:#4caf50; font-size:11px;">| Paid: ₹${paidVal}</span>
+            <strong>${escapeHTML(p.name)}</strong> 
+            <small style="color:#aaa;">(${escapeHTML(p.status || 'Live')})</small>
           </div>
-          <div style="display:flex; gap:4px;">
-            <button class="proliv-btn" style="padding:3px 6px; font-size:10px;" onclick="editPatient('${p.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" style="padding:3px 6px; font-size:10px;" onclick="deletePatient('${p.id}')">Del</button>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button class="proliv-btn proliv-btn-blue" style="padding:2px 6px; font-size:10px;" onclick="openAddVisitForPatient('${escapeHTML(p.name)}')">+ Visit / Rehab</button>
+            <button class="proliv-btn" style="padding:2px 5px; font-size:10px;" onclick="editPatient('${p.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" style="padding:2px 5px; font-size:10px;" onclick="deletePatient('${p.id}')">X</button>
           </div>
         </div>
       `;
     });
 
-    // Schedules & Daily Visits List (Showing Doctor Name and Time clearly for 50+ Screen view)
+    // 2. Ultra-Compact Rehab & Visits List (Shows Doctor, Time, Fee Amount)
     const sContainer = document.getElementById("schedules-list");
-    sContainer.innerHTML = schedules.length === 0 ? "<p style='color:#777; font-size:12px;'>No visits or schedules.</p>" : "";
+    sContainer.innerHTML = schedules.length === 0 ? "<p style='color:#777; font-size:11px;'>No visits recorded.</p>" : "";
     schedules.forEach((s) => {
+      let feeText = s.amount > 0 ? `<span style="color:#4caf50; font-weight:bold;"> | ₹${s.amount}</span>` : '';
+      let notesText = s.notes ? ` (${escapeHTML(s.notes)})` : '';
+      
       sContainer.innerHTML += `
         <div class="card-item">
           <div style="flex:1; cursor:pointer;" onclick="editSchedule('${s.id}')">
-            <strong>${escapeHTML(s.name)}</strong> <small style="color:#2196f3;">(🩺 Dr. ${escapeHTML(s.doctor || 'N/A')})</small><br>
-            <small style="color:#aaa;">📅 ${escapeHTML(s.date || '')} | ⏰ ${escapeHTML(s.time || '')} ${s.notes ? '| ' + escapeHTML(s.notes) : ''}</small>
+            <strong>${escapeHTML(s.name)}</strong> <small style="color:#2196f3;">[Dr. ${escapeHTML(s.doctor || 'N/A')}]</small>${feeText}<br>
+            <small style="color:#aaa;">📅 ${escapeHTML(s.date || '')} | ⏰ ${escapeHTML(s.time || '')}${notesText}</small>
           </div>
           <div style="display:flex; gap:4px;">
-            <button class="proliv-btn" style="padding:3px 6px; font-size:10px;" onclick="editSchedule('${s.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" style="padding:3px 6px; font-size:10px;" onclick="deleteSchedule('${s.id}')">Del</button>
+            <button class="proliv-btn" style="padding:2px 5px; font-size:10px;" onclick="editSchedule('${s.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" style="padding:2px 5px; font-size:10px;" onclick="deleteSchedule('${s.id}')">Del</button>
           </div>
         </div>
       `;
@@ -754,7 +756,7 @@
         <button id="expTabBtn" class="tab-btn" onclick="switchPnlTab('expense')">Expense</button>
       </div>
       <div id="collectionTabContent" class="tab-content active">
-        ${transactions.length === 0 ? "<p style='color:#777; text-align:center; font-size:12px;'>No records.</p>" : ""}
+        ${transactions.length === 0 ? "<p style='color:#777; text-align:center; font-size:11px;'>No records.</p>" : ""}
         ${transactions.map((t) => `
           <div class="pnl-row">
             <span>${escapeHTML(t.date || '')} - <b>${escapeHTML(t.title || '')}</b></span>
@@ -766,7 +768,7 @@
         `).join('')}
       </div>
       <div id="expenseTabContent" class="tab-content">
-        ${expenses.length === 0 ? "<p style='color:#777; text-align:center; font-size:12px;'>No records.</p>" : ""}
+        ${expenses.length === 0 ? "<p style='color:#777; text-align:center; font-size:11px;'>No records.</p>" : ""}
         ${expenses.map((e) => `
           <div class="pnl-row">
             <span>${escapeHTML(e.date || '')} - <b>${escapeHTML(e.title || '')}</b></span>
