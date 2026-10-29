@@ -1,4 +1,248 @@
-<!DOCTYPE html>
+<!-- PROLIV PHYSIO APP NAVIGATION + CARD LAYOUT -->
+<style>
+  .section-box {
+    display: none;
+    background: var(--card-bg, #1c1c1e);
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 14px;
+    margin: 14px 0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+  }
+
+  .section-box .section-header {
+    margin: 12px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #333;
+    gap: 8px;
+  }
+
+  .section-box .member-card,
+  .section-box .list-item {
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+
+  .section-box .data-list {
+    gap: 10px;
+  }
+
+  .section-home-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    margin-bottom: 8px;
+    border: 1px solid #444;
+    border-radius: 9px;
+    background: #303034;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .section-nav-card {
+    transition: transform .15s ease, border-color .15s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .section-nav-card:active {
+    transform: scale(.96);
+    border-color: var(--red-accent, #d32f2f);
+  }
+
+  .section-nav-card:focus-visible {
+    outline: 2px solid #d32f2f;
+    outline-offset: 3px;
+  }
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  const sectionDefinitions = [
+    {
+      id: "patients-box",
+      headerId: "patients-sec",
+      contentId: "patient-list-container",
+      title: "PATIENTS LIST",
+      icon: "👥",
+      label: "Patients List",
+      badge: "Patients"
+    },
+    {
+      id: "schedules-box",
+      headerId: "schedules-sec",
+      contentId: "schedules-list",
+      title: "SCHEDULES & REHAB",
+      icon: "📅",
+      label: "Schedules & Rehab",
+      badge: "Sessions"
+    },
+    {
+      id: "fees-box",
+      headerId: "fees-sec",
+      contentId: "fees-list",
+      title: "FEES & ACCOUNTS (P&L)",
+      icon: "💰",
+      label: "Fees & P&L",
+      badge: "Accounts"
+    }
+  ];
+
+  function initializeProlivCards() {
+    const dashboard = document.querySelector(".grid");
+
+    if (!dashboard) {
+      console.error("PROLIV PHYSIO dashboard grid not found.");
+      return;
+    }
+
+    // Prevent duplicate initialization.
+    if (document.getElementById("proliv-section-navigation")) return;
+
+    // Build the three navigation cards.
+    const navigation = document.createElement("div");
+    navigation.id = "proliv-section-navigation";
+    navigation.className = "grid section-nav";
+    navigation.style.marginBottom = "20px";
+
+    sectionDefinitions.forEach(function (section, index) {
+      const card = document.createElement("div");
+      card.className = "card section-nav-card";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", "Open " + section.label);
+
+      card.innerHTML = `
+        <div class="card-icon">${section.icon}</div>
+        <div class="card-label">${section.label}</div>
+        <div class="pill-badge ${
+          index === 1 ? "dark" : index === 2 ? "green" : ""
+        }">${section.badge}</div>
+      `;
+
+      card.addEventListener("click", function () {
+        openSection(section.id);
+      });
+
+      card.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openSection(section.id);
+        }
+      });
+
+      navigation.appendChild(card);
+    });
+
+    // Place navigation above the existing dashboard.
+    dashboard.parentNode.insertBefore(navigation, dashboard);
+
+    // Wrap each existing section without changing its list IDs.
+    sectionDefinitions.forEach(function (section) {
+      const header = document.getElementById(section.headerId);
+      const content = document.getElementById(section.contentId);
+
+      if (!header || !content) {
+        console.warn("Section elements missing:", section.id);
+        return;
+      }
+
+      const box = document.createElement("section");
+      box.id = section.id;
+      box.className = "section-box";
+      box.setAttribute("aria-label", section.title);
+
+      const homeButton = document.createElement("button");
+      homeButton.type = "button";
+      homeButton.className = "section-home-btn";
+      homeButton.textContent = "← Home";
+      homeButton.addEventListener("click", goHome);
+
+      header.parentNode.insertBefore(box, header);
+
+      box.appendChild(homeButton);
+      box.appendChild(header);
+      box.appendChild(content);
+    });
+
+    // Add patient count to the navigation card.
+    const patientCount = document.createElement("span");
+    patientCount.id = "proliv-nav-patient-count";
+    patientCount.className = "pill-badge";
+    patientCount.style.marginTop = "5px";
+
+    const patientCard = navigation.children[0];
+    const oldBadge = patientCard.querySelector(".pill-badge");
+
+    if (oldBadge) {
+      oldBadge.replaceWith(patientCount);
+    }
+
+    updateNavigationPatientCount();
+    goHome();
+  }
+
+  function openSection(sectionId) {
+    document.querySelectorAll(".section-box").forEach(function (box) {
+      box.style.display = "none";
+    });
+
+    const selected = document.getElementById(sectionId);
+
+    if (!selected) return;
+
+    selected.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function goHome() {
+    document.querySelectorAll(".section-box").forEach(function (box) {
+      box.style.display = "none";
+    });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function updateNavigationPatientCount() {
+    const countElement = document.getElementById(
+      "proliv-nav-patient-count"
+    );
+
+    if (
+      countElement &&
+      Array.isArray(window.patients)
+    ) {
+      countElement.textContent = window.patients.length;
+    }
+  }
+
+  // Make navigation functions available to the app.
+  window.openProlivSection = openSection;
+  window.goHome = goHome;
+  window.updateProlivPatientCount = updateNavigationPatientCount;
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeProlivCards
+    );
+  } else {
+    initializeProlivCards();
+  }
+})();
+</script>
+<!-- END PROLIV PHYSIO CARD LAYOUT --><!DOCTYPE html>
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
