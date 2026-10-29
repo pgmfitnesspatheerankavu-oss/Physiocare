@@ -1,467 +1,749 @@
-<!-- PROLIV PHYSIO APP NAVIGATION + CARD LAYOUT WITH PATIENT DETAILS, SCHEDULING & P&L -->
-<style>
-  .section-box {
-    display: none;
-    background: var(--card-bg, #1c1c1e);
-    border: 1px solid #333;
-    border-radius: 16px;
-    padding: 14px;
-    margin: 14px 0;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
-    color: #fff;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proliv Physio Management</title>
+  <style>
+    :root {
+      --bg-color: #121214;
+      --card-bg: #1c1c1e;
+      --border-color: #333;
+      --accent-red: #d32f2f;
+      --accent-green: #4caf50;
+      --text-main: #ffffff;
+      --text-muted: #aaa;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .card:active {
+      transform: scale(0.96);
+      border-color: var(--accent-red);
+    }
+    .card-icon { font-size: 24px; margin-bottom: 6px; }
+    .card-label { font-size: 13px; font-weight: 600; color: #ddd; }
+    .pill-badge {
+      display: inline-block;
+      background: var(--accent-red);
+      color: white;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-top: 6px;
+    }
+    .pill-badge.green { background: var(--accent-green); }
+    .pill-badge.dark { background: #444; }
 
-  .section-box .section-header {
-    margin: 12px 0;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    /* Top Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-card small { color: var(--text-muted); font-size: 11px; }
+    .stat-card div:last-child { font-size: 16px; font-weight: bold; margin-top: 4px; }
 
-  .section-home-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 9px 14px;
-    margin-bottom: 8px;
-    border: 1px solid #444;
-    border-radius: 9px;
-    background: #303034;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-  }
+    .section-box {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 14px 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+    }
+    .section-header {
+      margin: 12px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .section-home-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      margin-bottom: 12px;
+      border: 1px solid #444;
+      border-radius: 9px;
+      background: #303034;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-  .section-nav-card {
-    transition: transform .15s ease, border-color .15s ease;
-    cursor: pointer;
-    user-select: none;
-  }
+    /* Modals & Forms */
+    .proliv-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .proliv-modal-content {
+      background: #1c1c1e;
+      border: 1px solid #444;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .proliv-form-group { margin-bottom: 12px; }
+    .proliv-form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .proliv-form-group input, .proliv-form-group select, .proliv-form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #2a2a2e;
+      color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .proliv-btn {
+      background: var(--accent-red);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .proliv-btn-secondary { background: #444; }
+    .proliv-btn-green { background: #2e7d32; }
+    .proliv-btn-danger { background: #c62828; padding: 6px 10px; font-size: 12px; }
+    
+    .card-item {
+      background: #252528;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .flex-row { display: flex; gap: 10px; }
+    .flex-row > div { flex: 1; }
+  </style>
+</head>
+<body>
 
-  .section-nav-card:active {
-    transform: scale(.96);
-    border-color: var(--red-accent, #d32f2f);
-  }
+<div class="container">
+  <!-- Brand Header -->
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+    <div style="background: var(--accent-red); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">P</div>
+    <h2 style="margin: 0; font-size: 20px;">PROLIV PHYSIO</h2>
+  </div>
 
-  /* Modal / Detail View Styles */
-  .proliv-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-  }
-  .proliv-modal-content {
-    background: #1c1c1e;
-    border: 1px solid #444;
-    border-radius: 14px;
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 20px;
-    color: #fff;
-  }
-  .proliv-form-group {
-    margin-bottom: 12px;
-  }
-  .proliv-form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #aaa;
-  }
-  .proliv-form-group input, .proliv-form-group select, .proliv-form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #444;
-    background: #2a2a2e;
-    color: #fff;
-  }
-  .proliv-btn {
-    background: #d32f2f;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .proliv-btn-secondary {
-    background: #444;
-  }
-  .patient-item-card {
-    background: #252528;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    border: 1px solid #333;
-  }
-</style>
+  <!-- Dashboard Overview Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><small>Live Patients</small><div id="statLive">0</div></div>
+    <div class="stat-card"><small>Total Patients</small><div id="statTotal">0</div></div>
+    <div class="stat-card"><small>Discharged</small><div id="statDischarged">0</div></div>
+    <div class="stat-card"><small>Schedules</small><div id="statSchedules">0</div></div>
+    <div class="stat-card"><small>Collection</small><div id="statCollection" style="color:var(--accent-green);">₹0</div></div>
+    <div class="stat-card"><small>Net Profit</small><div id="statProfit">₹0</div></div>
+  </div>
+
+  <!-- Main Navigation Grid Cards -->
+  <div class="grid" id="proliv-section-navigation">
+    <div class="card section-nav-card" onclick="openSection('patients-box')">
+      <div class="card-icon">👥</div>
+      <div class="card-label">Patients List</div>
+      <div class="pill-badge" id="navPatientBadge">0</div>
+    </div>
+    <div class="card section-nav-card" onclick="openSection('schedules-box')">
+      <div class="card-icon">📅</div>
+      <div class="card-label">Schedules & Rehab</div>
+      <div class="pill-badge dark" id="navScheduleBadge">0</div>
+    </div>
+    <div class="card section-nav-card" onclick="openSection('fees-box')">
+      <div class="card-icon">💰</div>
+      <div class="card-label">Fees & P&L</div>
+      <div class="pill-badge green">Accounts</div>
+    </div>
+  </div>
+
+  <!-- 1. Patients Section -->
+  <section id="patients-box" class="section-box">
+    <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
+    <div class="section-header" id="patients-sec">
+      <span>PATIENTS LIST</span>
+    </div>
+    <button class="proliv-btn" style="margin-bottom: 14px;" onclick="openAddPatientModal()">+ Add New Patient</button>
+    <div id="patient-list-container"></div>
+  </section>
+
+  <!-- 2. Schedules Section -->
+  <section id="schedules-box" class="section-box">
+    <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
+    <div class="section-header" id="schedules-sec">
+      <span>SCHEDULES & REHAB</span>
+    </div>
+    <button class="proliv-btn" style="margin-bottom: 14px;" onclick="openAddScheduleModal()">+ Add Schedule / Rehab</button>
+    <div id="schedules-list"></div>
+  </section>
+
+  <!-- 3. Fees & P&L Section -->
+  <section id="fees-box" class="section-box">
+    <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
+    <div class="section-header" id="fees-sec">
+      <span>FEES & ACCOUNTS (P&L)</span>
+    </div>
+    <div style="display:flex; gap:10px; margin-bottom:14px;">
+      <button class="proliv-btn proliv-btn-green" style="flex:1;" onclick="openAddTransactionModal()">+ Add Income</button>
+      <button class="proliv-btn proliv-btn-secondary" style="flex:1;" onclick="openAddExpenseModal()">+ Add Expense</button>
+    </div>
+    <div id="fees-list"></div>
+  </section>
+</div>
+
+<!-- Modals Container -->
+<div id="proliv-dynamic-modals">
+  <!-- Patient Modal -->
+  <div id="patientModal" class="proliv-modal">
+    <div class="proliv-modal-content">
+      <h3 id="patientModalTitle" style="margin-top:0;">Patient Details</h3>
+      <form id="patientForm">
+        <input type="hidden" id="pIndex">
+        <div class="proliv-form-group">
+          <label>Patient Name *</label>
+          <input type="text" id="pName" required>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Phone</label>
+            <input type="tel" id="pPhone">
+          </div>
+          <div class="proliv-form-group">
+            <label>Place / Location</label>
+            <input type="text" id="pPlace">
+          </div>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Plan / Treatment</label>
+            <input type="text" id="pPlan">
+          </div>
+          <div class="proliv-form-group">
+            <label>Total Fee / Final Amt (₹)</label>
+            <input type="number" id="pFee" value="0">
+          </div>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Paid Amount (₹)</label>
+            <input type="number" id="pPaid" value="0">
+          </div>
+          <div class="proliv-form-group">
+            <label>Status</label>
+            <select id="pStatus">
+              <option value="Live">Live</option>
+              <option value="Discharged">Discharged</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Start Date</label>
+            <input type="date" id="pStartDate">
+          </div>
+          <div class="proliv-form-group">
+            <label>End Date</label>
+            <input type="date" id="pEndDate">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button type="submit" class="proliv-btn" style="flex:1;">Save Patient</button>
+          <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Schedule Modal -->
+  <div id="scheduleModal" class="proliv-modal">
+    <div class="proliv-modal-content">
+      <h3 id="scheduleModalTitle" style="margin-top:0;">Schedule & Rehab</h3>
+      <form id="scheduleForm">
+        <input type="hidden" id="sIndex">
+        <div class="proliv-form-group">
+          <label>Patient Name *</label>
+          <input type="text" id="sName" required>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Date</label>
+            <input type="date" id="sDate">
+          </div>
+          <div class="proliv-form-group">
+            <label>Time</label>
+            <input type="time" id="sTime">
+          </div>
+        </div>
+        <div class="proliv-form-group">
+          <label>Rehab Notes / Session Details</label>
+          <textarea id="sNotes" rows="3"></textarea>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button type="submit" class="proliv-btn" style="flex:1;">Save Schedule</button>
+          <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div id="expenseModal" class="proliv-modal">
+    <div class="proliv-modal-content">
+      <h3 style="margin-top:0;">Add Clinic Expense</h3>
+      <form id="expenseForm">
+        <div class="proliv-form-group">
+          <label>Expense Title / Reason *</label>
+          <input type="text" id="eTitle" required>
+        </div>
+        <div class="proliv-form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" id="eAmount" required>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button type="submit" class="proliv-btn" style="flex:1;">Add Expense</button>
+          <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Income/Transaction Modal -->
+  <div id="transactionModal" class="proliv-modal">
+    <div class="proliv-modal-content">
+      <h3 style="margin-top:0;">Add Other Income</h3>
+      <form id="transactionForm">
+        <div class="proliv-form-group">
+          <label>Source / Description *</label>
+          <input type="text" id="tTitle" required>
+        </div>
+        <div class="proliv-form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" id="tAmount" required>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button type="submit" class="proliv-btn proliv-btn-green" style="flex:1;">Add Income</button>
+          <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
-(function () {
-  "use strict";
+  (function () {
+    "use strict";
 
-  // Ensure global data store
-  window.patients = window.patients || [];
-  window.expenses = window.expenses || [];
-
-  const sectionDefinitions = [
-    {
-      id: "patients-box",
-      headerId: "patients-sec",
-      contentId: "patient-list-container",
-      title: "PATIENTS LIST",
-      icon: "👥",
-      label: "Patients List",
-      badge: "Patients"
-    },
-    {
-      id: "schedules-box",
-      headerId: "schedules-sec",
-      contentId: "schedules-list",
-      title: "SCHEDULES & REHAB",
-      icon: "📅",
-      label: "Schedules & Rehab",
-      badge: "Sessions"
-    },
-    {
-      id: "fees-box",
-      headerId: "fees-sec",
-      contentId: "fees-list",
-      title: "FEES & ACCOUNTS (P&L)",
-      icon: "💰",
-      label: "Fees & P&L",
-      badge: "Accounts"
-    }
-  ];
-
-  function initializeProlivCards() {
-    const dashboard = document.querySelector(".grid");
-
-    if (!dashboard) {
-      console.error("PROLIV PHYSIO dashboard grid not found.");
-      return;
-    }
-
-    if (document.getElementById("proliv-section-navigation")) return;
-
-    // Build Navigation Cards
-    const navigation = document.createElement("div");
-    navigation.id = "proliv-section-navigation";
-    navigation.className = "grid section-nav";
-    navigation.style.marginBottom = "20px";
-
-    sectionDefinitions.forEach(function (section, index) {
-      const card = document.createElement("div");
-      card.className = "card section-nav-card";
-      card.tabIndex = 0;
-      card.setAttribute("role", "button");
-      card.setAttribute("aria-label", "Open " + section.label);
-
-      card.innerHTML = `
-        <div class="card-icon">${section.icon}</div>
-        <div class="card-label">${section.label}</div>
-        <div class="pill-badge ${index === 1 ? "dark" : index === 2 ? "green" : ""}">${section.badge}</div>
-      `;
-
-      card.addEventListener("click", function () {
-        openSection(section.id);
-      });
-
-      navigation.appendChild(card);
-    });
-
-    dashboard.parentNode.insertBefore(navigation, dashboard);
-
-    // Wrap sections & Add Add Action Buttons
-    sectionDefinitions.forEach(function (section) {
-      const header = document.getElementById(section.headerId);
-      const content = document.getElementById(section.contentId);
-
-      if (!header || !content) return;
-
-      const box = document.createElement("section");
-      box.id = section.id;
-      box.className = "section-box";
-
-      const homeButton = document.createElement("button");
-      homeButton.type = "button";
-      homeButton.className = "section-home-btn";
-      homeButton.textContent = "← Home";
-      homeButton.addEventListener("click", goHome);
-
-      header.parentNode.insertBefore(box, header);
-      box.appendChild(homeButton);
-      box.appendChild(header);
-
-      // Add specific action buttons based on section
-      if (section.id === "patients-box") {
-        const addBtn = document.createElement("button");
-        addBtn.className = "proliv-btn";
-        addBtn.style.margin = "10px 0";
-        addBtn.textContent = "+ Add New Patient";
-        addBtn.onclick = openAddPatientModal;
-        box.appendChild(addBtn);
-      } else if (section.id === "fees-box") {
-        const addExpBtn = document.createElement("button");
-        addExpBtn.className = "proliv-btn proliv-btn-secondary";
-        addExpBtn.style.margin = "10px 0";
-        addExpBtn.textContent = "+ Add Expense";
-        addExpBtn.onclick = openAddExpenseModal;
-        box.appendChild(addExpBtn);
+    function safeGetJSON(key, fallback) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : fallback;
+      } catch (e) {
+        console.error("Error parsing localStorage key '" + key + "':", e);
+        return fallback;
       }
+    }
 
-      box.appendChild(content);
-    });
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
 
-    // Patient Count Badge
-    const patientCount = document.createElement("span");
-    patientCount.id = "proliv-nav-patient-count";
-    patientCount.className = "pill-badge";
-    patientCount.style.marginTop = "5px";
+    const rawPatients = safeGetJSON("proliv_patients", []);
+    window.patients = rawPatients.map(p => ({
+      ...p,
+      name: p.name || p.patientName || 'Unknown',
+      phone: p.phone || p.mobile || '',
+      place: p.place || p.location || '',
+      plan: p.plan || p.treatment || '',
+      fee: p.fee !== undefined ? p.fee : (p.finalAmt !== undefined ? p.finalAmt : 0),
+      paid: p.paid !== undefined ? p.paid : (p.paidAmount !== undefined ? p.paidAmount : 0),
+      status: p.status || 'Live',
+      startDate: p.startDate || p.date || '',
+      endDate: p.endDate || ''
+    }));
 
-    const patientCard = navigation.children[0];
-    const oldBadge = patientCard.querySelector(".pill-badge");
-    if (oldBadge) oldBadge.replaceWith(patientCount);
+    window.schedules = safeGetJSON("proliv_schedules", []);
+    window.expenses = safeGetJSON("proliv_expenses", []);
+    window.transactions = safeGetJSON("proliv_transactions", []);
 
-    createModals();
-    updateNavigationPatientCount();
-    renderProlivData();
-    goHome();
-  }
+    function saveData() {
+      localStorage.setItem("proliv_patients", JSON.stringify(window.patients));
+      localStorage.setItem("proliv_schedules", JSON.stringify(window.schedules));
+      localStorage.setItem("proliv_expenses", JSON.stringify(window.expenses));
+      localStorage.setItem("proliv_transactions", JSON.stringify(window.transactions));
+      updateDashboardStats();
+    }
 
-  // Create Modals for Patient Add/Edit & Expenses
-  function createModals() {
-    if (document.getElementById("proliv-dynamic-modals")) return;
-
-    const modalContainer = document.createElement("div");
-    modalContainer.id = "proliv-dynamic-modals";
-    modalContainer.innerHTML = `
-      <div id="patientModal" class="proliv-modal">
-        <div class="proliv-modal-content">
-          <h3 id="modalTitle">Patient Details</h3>
-          <form id="patientForm">
-            <input type="hidden" id="pIndex">
-            <div class="proliv-form-group">
-              <label>Patient Name</label>
-              <input type="text" id="pName" required>
-            </div>
-            <div class="proliv-form-group">
-              <label>Appointment Time / Schedule</label>
-              <input type="time" id="pTime" required>
-            </div>
-            <div class="proliv-form-group">
-              <label>Rehab Status / Notes</label>
-              <textarea id="pRehab" rows="3"></textarea>
-            </div>
-            <div class="proliv-form-group">
-              <label>Fee Amount (₹)</label>
-              <input type="number" id="pFee" value="0">
-            </div>
-            <div class="proliv-form-group">
-              <label>Status</label>
-              <select id="pStatus">
-                <option value="Live">Live</option>
-                <option value="Discharged">Discharged</option>
-              </select>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-              <button type="submit" class="proliv-btn">Save Patient</button>
-              <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div id="expenseModal" class="proliv-modal">
-        <div class="proliv-modal-content">
-          <h3>Add Clinic Expense</h3>
-          <form id="expenseForm">
-            <div class="proliv-form-group">
-              <label>Expense Title / Reason</label>
-              <input type="text" id="eTitle" required>
-            </div>
-            <div class="proliv-form-group">
-              <label>Amount (₹)</label>
-              <input type="number" id="eAmount" required>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-              <button type="submit" class="proliv-btn">Add Expense</button>
-              <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modalContainer);
-
-    // Form Submissions
+    // Forms Handlers
     document.getElementById("patientForm").onsubmit = function(e) {
       e.preventDefault();
-      const index = document.getElementById("pIndex").value;
-      const patientData = {
-        name: document.getElementById("pName").value,
-        time: document.getElementById("pTime").value,
-        rehab: document.getElementById("pRehab").value,
-        fee: parseFloat(document.getElementById("pFee").value) || 0,
-        status: document.getElementById("pStatus").value
-      };
+      const idx = document.getElementById("pIndex").value;
+      const newName = document.getElementById("pName").value;
+      const newPhone = document.getElementById("pPhone").value;
+      const newPlace = document.getElementById("pPlace").value;
+      const newPlan = document.getElementById("pPlan").value;
+      const newFee = parseFloat(document.getElementById("pFee").value) || 0;
+      const newPaid = parseFloat(document.getElementById("pPaid").value) || 0;
+      const newStatus = document.getElementById("pStatus").value;
+      const newStart = document.getElementById("pStartDate").value;
+      const newEnd = document.getElementById("pEndDate").value;
 
-      if (index === "") {
-        window.patients.push(patientData);
+      if (idx === "") {
+        window.patients.push({
+          name: newName, phone: newPhone, place: newPlace, plan: newPlan,
+          fee: newFee, paid: newPaid, status: newStatus, startDate: newStart, endDate: newEnd
+        });
       } else {
-        window.patients[index] = patientData;
+        window.patients[idx] = {
+          ...window.patients[idx],
+          name: newName, phone: newPhone, place: newPlace, plan: newPlan,
+          fee: newFee, paid: newPaid, status: newStatus, startDate: newStart, endDate: newEnd
+        };
       }
+      saveData(); closeModals(); renderAllData();
+    };
 
-      closeModals();
-      renderProlivData();
+    document.getElementById("scheduleForm").onsubmit = function(e) {
+      e.preventDefault();
+      const idx = document.getElementById("sIndex").value;
+      const data = {
+        name: document.getElementById("sName").value,
+        date: document.getElementById("sDate").value,
+        time: document.getElementById("sTime").value,
+        notes: document.getElementById("sNotes").value
+      };
+      if (idx === "") { window.schedules.push(data); }
+      else { window.schedules[idx] = data; }
+      saveData(); closeModals(); renderAllData();
     };
 
     document.getElementById("expenseForm").onsubmit = function(e) {
       e.preventDefault();
-      const expenseData = {
+      window.expenses.push({
         title: document.getElementById("eTitle").value,
         amount: parseFloat(document.getElementById("eAmount").value) || 0,
         date: new Date().toLocaleDateString()
-      };
-      window.expenses.push(expenseData);
-      closeModals();
-      renderProlivData();
+      });
+      saveData(); closeModals(); renderAllData();
     };
-  }
 
-  window.openAddPatientModal = function() {
-    document.getElementById("modalTitle").textContent = "Add New Patient";
-    document.getElementById("pIndex").value = "";
-    document.getElementById("pName").value = "";
-    document.getElementById("pTime").value = "";
-    document.getElementById("pRehab").value = "";
-    document.getElementById("pFee").value = "0";
-    document.getElementById("pStatus").value = "Live";
-    document.getElementById("patientModal").style.display = "flex";
-  };
-
-  window.editPatient = function(index) {
-    const p = window.patients[index];
-    document.getElementById("modalTitle").textContent = "Edit Patient Details";
-    document.getElementById("pIndex").value = index;
-    document.getElementById("pName").value = p.name;
-    document.getElementById("pTime").value = p.time || "";
-    document.getElementById("pRehab").value = p.rehab || "";
-    document.getElementById("pFee").value = p.fee || 0;
-    document.getElementById("pStatus").value = p.status || "Live";
-    document.getElementById("patientModal").style.display = "flex";
-  };
-
-  window.openAddExpenseModal = function() {
-    document.getElementById("eTitle").value = "";
-    document.getElementById("eAmount").value = "";
-    document.getElementById("expenseModal").style.display = "flex";
-  };
-
-  window.closeModals = function() {
-    document.getElementById("patientModal").style.display = "none";
-    document.getElementById("expenseModal").style.display = "none";
-  };
-
-  function renderProlivData() {
-    // 1. Render Patients List
-    const pContainer = document.getElementById("patient-list-container");
-    if (pContainer) {
-      pContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No patients added yet.</p>" : "";
-      window.patients.forEach((p, idx) => {
-        pContainer.innerHTML += `
-          <div class="patient-item-card" onclick="editPatient(${idx})">
-            <div>
-              <strong>${p.name}</strong><br>
-              <small style="color:#aaa;">Time: ${p.time || 'Not Set'} | Status: ${p.status}</small>
-            </div>
-            <div><span>👉 Edit</span></div>
-          </div>
-        `;
+    document.getElementById("transactionForm").onsubmit = function(e) {
+      e.preventDefault();
+      window.transactions.push({
+        title: document.getElementById("tTitle").value,
+        amount: parseFloat(document.getElementById("tAmount").value) || 0,
+        type: 'income',
+        isStandalone: true, // Marker to distinguish from patient paid fee
+        date: new Date().toLocaleDateString()
       });
-    }
+      saveData(); closeModals(); renderAllData();
+    };
 
-    // 2. Render Schedules List
-    const sContainer = document.getElementById("schedules-list");
-    if (sContainer) {
-      sContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No schedules available.</p>" : "";
-      window.patients.forEach((p) => {
-        sContainer.innerHTML += `
-          <div style="background:#252528; padding:10px; border-radius:8px; margin-bottom:8px;">
-            <strong>${p.name}</strong> - ⏰ ${p.time || 'No Time'}
-            <p style="margin:5px 0 0 0; font-size:13px; color:#ccc;">Rehab: ${p.rehab || 'None'}</p>
-          </div>
-        `;
-      });
-    }
+    // Modals Triggers
+    window.openAddPatientModal = function() {
+      document.getElementById("patientModalTitle").textContent = "Add New Patient";
+      document.getElementById("pIndex").value = "";
+      document.getElementById("pName").value = "";
+      document.getElementById("pPhone").value = "";
+      document.getElementById("pPlace").value = "";
+      document.getElementById("pPlan").value = "";
+      document.getElementById("pFee").value = "0";
+      document.getElementById("pPaid").value = "0";
+      document.getElementById("pStatus").value = "Live";
+      document.getElementById("pStartDate").value = "";
+      document.getElementById("pEndDate").value = "";
+      document.getElementById("patientModal").style.display = "flex";
+    };
 
-    // 3. Render P&L Accounts & Expenses
-    const fContainer = document.getElementById("fees-list");
-    if (fContainer) {
-      let totalCollection = window.patients.reduce((sum, p) => sum + (p.fee || 0), 0);
+    window.editPatient = function(idx) {
+      const p = window.patients[idx];
+      document.getElementById("patientModalTitle").textContent = "Edit Patient Details";
+      document.getElementById("pIndex").value = idx;
+      document.getElementById("pName").value = p.name || "";
+      document.getElementById("pPhone").value = p.phone || "";
+      document.getElementById("pPlace").value = p.place || "";
+      document.getElementById("pPlan").value = p.plan || "";
+      document.getElementById("pFee").value = p.fee !== undefined ? p.fee : (p.finalAmt || 0);
+      document.getElementById("pPaid").value = p.paid !== undefined ? p.paid : (p.paidAmount || 0);
+      document.getElementById("pStatus").value = p.status || "Live";
+      document.getElementById("pStartDate").value = p.startDate || "";
+      document.getElementById("pEndDate").value = p.endDate || "";
+      document.getElementById("patientModal").style.display = "flex";
+    };
+
+    window.deletePatient = function(idx) {
+      if (confirm("Delete this patient?")) {
+        window.patients.splice(idx, 1);
+        saveData(); renderAllData();
+      }
+    };
+
+    window.openAddScheduleModal = function() {
+      document.getElementById("scheduleModalTitle").textContent = "Add Schedule";
+      document.getElementById("sIndex").value = "";
+      document.getElementById("sName").value = "";
+      document.getElementById("sDate").value = "";
+      document.getElementById("sTime").value = "";
+      document.getElementById("sNotes").value = "";
+      document.getElementById("scheduleModal").style.display = "flex";
+    };
+
+    window.editSchedule = function(idx) {
+      const s = window.schedules[idx];
+      document.getElementById("scheduleModalTitle").textContent = "Edit Schedule";
+      document.getElementById("sIndex").value = idx;
+      document.getElementById("sName").value = s.name || "";
+      document.getElementById("sDate").value = s.date || "";
+      document.getElementById("sTime").value = s.time || "";
+      document.getElementById("sNotes").value = s.notes || "";
+      document.getElementById("scheduleModal").style.display = "flex";
+    };
+
+    window.deleteSchedule = function(idx) {
+      if (confirm("Delete this schedule?")) {
+        window.schedules.splice(idx, 1);
+        saveData(); renderAllData();
+      }
+    };
+
+    window.openAddExpenseModal = function() {
+      document.getElementById("eTitle").value = "";
+      document.getElementById("eAmount").value = "";
+      document.getElementById("expenseModal").style.display = "flex";
+    };
+
+    window.openAddTransactionModal = function() {
+      document.getElementById("tTitle").value = "";
+      document.getElementById("tAmount").value = "";
+      document.getElementById("transactionModal").style.display = "flex";
+    };
+
+    window.deleteExpense = function(idx) {
+      window.expenses.splice(idx, 1);
+      saveData(); renderAllData();
+    };
+
+    window.deleteTransaction = function(idx) {
+      window.transactions.splice(idx, 1);
+      saveData(); renderAllData();
+    };
+
+    window.closeModals = function() {
+      document.getElementById("patientModal").style.display = "none";
+      document.getElementById("scheduleModal").style.display = "none";
+      document.getElementById("expenseModal").style.display = "none";
+      document.getElementById("transactionModal").style.display = "none";
+    };
+
+    // Calculation Helper to avoid Double-Counting
+    function getFinancials() {
+      let patientCollection = window.patients.reduce((sum, p) => sum + (p.paid !== undefined ? p.paid : (p.paidAmount || 0)), 0);
+      
+      // Calculate standalone income from transactions to prevent double counting with patient.paid
+      let standaloneIncome = window.transactions.reduce((sum, t) => {
+        if (t.isStandalone || (t.type === 'income' && !t.patientId)) {
+          return sum + (t.amount || 0);
+        }
+        return sum;
+      }, 0);
+
+      let totalCollection = patientCollection + standaloneIncome;
+
+      let totalDue = window.patients.reduce((sum, p) => {
+        let f = p.fee !== undefined ? p.fee : (p.finalAmt || 0);
+        let pd = p.paid !== undefined ? p.paid : (p.paidAmount || 0);
+        return sum + Math.max(0, f - pd);
+      }, 0);
+
       let totalExpense = window.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
       let netProfit = totalCollection - totalExpense;
 
+      return { patientCollection, standaloneIncome, totalCollection, totalDue, totalExpense, netProfit };
+    }
+
+    function renderAllData() {
+      // Render Patients List
+      const pContainer = document.getElementById("patient-list-container");
+      pContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No patients added yet.</p>" : "";
+      window.patients.forEach((p, idx) => {
+        let feeVal = p.fee !== undefined ? p.fee : (p.finalAmt || 0);
+        let paidVal = p.paid !== undefined ? p.paid : (p.paidAmount || 0);
+        let due = feeVal - paidVal;
+        
+        pContainer.innerHTML += `
+          <div class="card-item">
+            <div style="flex:1; cursor:pointer;" onclick="editPatient(${idx})">
+              <strong>${escapeHTML(p.name)}</strong> (${escapeHTML(p.status || 'Live')})<br>
+              <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small><br>
+              <small style="color:#4caf50;">Paid: ₹${paidVal}</small> | <small style="color:${due > 0 ? '#f44336':'#aaa'};">Due: ₹${due}</small>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editPatient(${idx})">Edit</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="deletePatient(${idx})">Del</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Render Schedules List
+      const sContainer = document.getElementById("schedules-list");
+      sContainer.innerHTML = window.schedules.length === 0 ? "<p style='color:#777;'>No schedules available.</p>" : "";
+      window.schedules.forEach((s, idx) => {
+        sContainer.innerHTML += `
+          <div class="card-item">
+            <div style="flex:1; cursor:pointer;" onclick="editSchedule(${idx})">
+              <strong>${escapeHTML(s.name)}</strong><br>
+              <small style="color:#aaa;">📅 ${escapeHTML(s.date || 'No Date')} | ⏰ ${escapeHTML(s.time || 'No Time')}</small>
+              <p style="margin:4px 0 0 0; font-size:13px; color:#ddd;">Rehab: ${escapeHTML(s.notes || 'None')}</p>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editSchedule(${idx})">Edit</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="deleteSchedule(${idx})">Del</button>
+            </div>
+          </div>
+        `;
+      });
+
+      // Render Fees & P&L
+      const fContainer = document.getElementById("fees-list");
+      const fin = getFinancials();
+
       fContainer.innerHTML = `
-        <div style="background:#252528; padding:12px; border-radius:8px; margin-bottom:10px;">
-          <p><strong>Total Collection:</strong> ₹${totalCollection}</p>
-          <p><strong>Total Expenses:</strong> ₹${totalExpense}</p>
-          <p style="color: ${netProfit >= 0 ? '#4caf50' : '#f44336'};"><strong>Net Profit:</strong> ₹${netProfit}</p>
+        <div style="background:#252528; padding:14px; border-radius:12px; margin-bottom:14px; border:1px solid #444;">
+          <p style="margin:4px 0;"><strong>Patient Payments:</strong> ₹${fin.patientCollection}</p>
+          <p style="margin:4px 0;"><strong>Other Income:</strong> ₹${fin.standaloneIncome}</p>
+          <p style="margin:4px 0; color:#4caf50;"><strong>Total Collection:</strong> ₹${fin.totalCollection}</p>
+          <p style="margin:4px 0; color:#f44336;"><strong>Total Due Amount:</strong> ₹${fin.totalDue}</p>
+          <p style="margin:4px 0; color:#e0e0e0;"><strong>Total Expenses:</strong> ₹${fin.totalExpense}</p>
+          <hr style="border:0; border-top:1px solid #444; margin:8px 0;">
+          <p style="margin:4px 0; font-size:16px; color: ${fin.netProfit >= 0 ? '#4caf50' : '#f44336'};"><strong>Net Profit:</strong> ₹${fin.netProfit}</p>
         </div>
-        <h4>Expense History</h4>
+        
+        <h4 style="margin:10px 0;">Other Income History</h4>
+        ${window.transactions.length === 0 ? "<p style='color:#777;'>No other income recorded.</p>" : ""}
+        ${window.transactions.map((t, idx) => `
+          <div style="background:#252528; padding:8px 12px; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+            <div>${escapeHTML(t.title || 'Income')} : <b style="color:#4caf50;">+₹${t.amount}</b> <small style="color:#aaa;">(${escapeHTML(t.date || '')})</small></div>
+            <button class="proliv-btn proliv-btn-danger" style="padding:4px 8px;" onclick="deleteTransaction(${idx})">X</button>
+          </div>
+        `).join('')}
+
+        <h4 style="margin:14px 0 10px 0;">Expense History</h4>
         ${window.expenses.length === 0 ? "<p style='color:#777;'>No expenses recorded.</p>" : ""}
-        ${window.expenses.map(e => `<div style="background:#222; padding:8px; border-radius:6px; margin-bottom:5px; font-size:13px;">${e.title} : <b>₹${e.amount}</b> (${e.date})</div>`).join('')}
+        ${window.expenses.map((e, idx) => `
+          <div style="background:#252528; padding:8px 12px; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+            <div>${escapeHTML(e.title)} : <b style="color:#f44336;">-₹${e.amount}</b> <small style="color:#aaa;">(${escapeHTML(e.date)})</small></div>
+            <button class="proliv-btn proliv-btn-danger" style="padding:4px 8px;" onclick="deleteExpense(${idx})">X</button>
+          </div>
+        `).join('')}
       `;
+
+      updateDashboardStats();
     }
 
-    updateNavigationPatientCount();
-  }
+    function updateDashboardStats() {
+      const liveCount = window.patients.filter(p => (p.status || 'Live') === "Live").length;
+      const totalCount = window.patients.length;
+      const dischargedCount = window.patients.filter(p => p.status === "Discharged").length;
+      const schedCount = window.schedules.length;
+      
+      const fin = getFinancials();
 
-  function openSection(sectionId) {
-    document.querySelectorAll(".section-box").forEach(function (box) {
-      box.style.display = "none";
-    });
-    const selected = document.getElementById(sectionId);
-    if (selected) selected.style.display = "block";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+      document.getElementById("statLive").textContent = liveCount;
+      document.getElementById("statTotal").textContent = totalCount;
+      document.getElementById("statDischarged").textContent = dischargedCount;
+      document.getElementById("statSchedules").textContent = schedCount;
+      document.getElementById("statCollection").textContent = "₹" + fin.totalCollection;
+      document.getElementById("statProfit").textContent = "₹" + fin.netProfit;
 
-  function goHome() {
-    document.querySelectorAll(".section-box").forEach(function (box) {
-      box.style.display = "none";
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function updateNavigationPatientCount() {
-    const countElement = document.getElementById("proliv-nav-patient-count");
-    if (countElement && Array.isArray(window.patients)) {
-      countElement.textContent = window.patients.length;
+      document.getElementById("navPatientBadge").textContent = totalCount;
+      document.getElementById("navScheduleBadge").textContent = schedCount;
     }
-  }
 
-  window.openProlivSection = openSection;
-  window.goHome = goHome;
-  window.updateProlivPatientCount = updateNavigationPatientCount;
+    // Navigation
+    window.openSection = function(sectionId) {
+      document.querySelectorAll(".section-box").forEach(function (box) {
+        box.style.display = "none";
+      });
+      document.getElementById("proliv-section-navigation").style.display = "none";
+      document.querySelector(".stats-grid").style.display = "none";
+      
+      const selected = document.getElementById(sectionId);
+      if (selected) selected.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeProlivCards);
-  } else {
-    initializeProlivCards();
-  }
-})();
+    window.goHome = function() {
+      document.querySelectorAll(".section-box").forEach(function (box) {
+        box.style.display = "none";
+      });
+      document.getElementById("proliv-section-navigation").style.display = "grid";
+      document.querySelector(".stats-grid").style.display = "grid";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderAllData();
+  })();
 </script>
-<!-- END PROLIV PHYSIO APP -->
+</body>
+</html>
