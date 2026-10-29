@@ -458,27 +458,20 @@
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script>
+  // LocalStorage Data Management
+  let patients = JSON.parse(localStorage.getItem('proliv_patients')) || [];
+  let schedules = JSON.parse(localStorage.getItem('proliv_schedules')) || [];
+  let expenses = JSON.parse(localStorage.getItem('proliv_expenses')) || [];
+  let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [];
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBycFo1QjDvdbDC9vasPCx...", // നിങ്ങളുടെ ഒറിജിനൽ apiKey ഇവിടെ മുഴുവനായി നൽകുക
-    authDomain: "pgm-98fde.firebaseapp.com",
-    projectId: "pgm-98fde",
-    storageBucket: "pgm-98fde.appspot.com",
-    messagingSenderId: "856565683408",
-    appId: "1:856565683408:web:969eeafc4...",
-    measurementId: "G-75DP1JVT6F"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.patients = [];
-  window.schedules = [];
-  window.expenses = [];
-  window.transactions = [];
+  function saveData() {
+    localStorage.setItem('proliv_patients', JSON.stringify(patients));
+    localStorage.setItem('proliv_schedules', JSON.stringify(schedules));
+    localStorage.setItem('proliv_expenses', JSON.stringify(expenses));
+    localStorage.setItem('proliv_transactions', JSON.stringify(transactions));
+    renderAllData();
+  }
 
   function escapeHTML(str) {
     if (!str) return '';
@@ -487,37 +480,9 @@
     );
   }
 
-  // Real-time synchronization from Firestore
-  onSnapshot(collection(db, "patients"), (snapshot) => {
-    window.patients = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderAllData();
-  });
-
-  onSnapshot(collection(db, "schedules"), (snapshot) => {
-    window.schedules = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderAllData();
-  });
-
-  onSnapshot(collection(db, "expenses"), (snapshot) => {
-    window.expenses = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderAllData();
-  });
-
-  onSnapshot(collection(db, "transactions"), (snapshot) => {
-    window.transactions = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-    renderAllData();
-  });
-
-  // Backup Export Function
-  window.exportBackup = function() {
-    const backupData = {
-      patients: window.patients,
-      schedules: window.schedules,
-      expenses: window.expenses,
-      transactions: window.transactions,
-      version: "1.0",
-      date: new Date().toISOString()
-    };
+  // Backup Export
+  function exportBackup() {
+    const backupData = { patients, schedules, expenses, transactions, version: "1.0", date: new Date().toISOString() };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
@@ -525,22 +490,23 @@
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-  };
+  }
 
-  // Backup Import Function
-  window.importBackup = function(event) {
+  // Backup Import
+  function importBackup(event) {
     const fileReader = new FileReader();
     if(event.target.files[0]) {
       fileReader.readAsText(event.target.files[0], "UTF-8");
-      fileReader.onload = async function(e) {
+      fileReader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
           if(parsed.patients || parsed.expenses) {
             if(confirm("ഇത് നിലവിലുള്ള ഡാറ്റ പുതിയ ബാക്കപ്പ് ഫയൽ ഉപയോഗിച്ച് റീപ്ലേസ് ചെയ്യും. തുടരണോ?")) {
-              for(let p of (parsed.patients || [])) { delete p.id; await addDoc(collection(db, "patients"), p); }
-              for(let s of (parsed.schedules || [])) { delete s.id; await addDoc(collection(db, "schedules"), s); }
-              for(let ex of (parsed.expenses || [])) { delete ex.id; await addDoc(collection(db, "expenses"), ex); }
-              for(let t of (parsed.transactions || [])) { delete t.id; await addDoc(collection(db, "transactions"), t); }
+              patients = parsed.patients || [];
+              schedules = parsed.schedules || [];
+              expenses = parsed.expenses || [];
+              transactions = parsed.transactions || [];
+              saveData();
               alert("ഡാറ്റ വിജയകരമായി റെസ്റ്റോർ (Restore) ചെയ്തു!");
             }
           } else {
@@ -551,13 +517,14 @@
         }
       };
     }
-  };
+  }
 
   // Forms Handlers
-  document.getElementById("patientForm").onsubmit = async function(e) {
+  document.getElementById("patientForm").onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById("pId").value;
     const patientData = {
+      id: id ? id : 'p_' + Date.now(),
       name: document.getElementById("pName").value,
       phone: document.getElementById("pPhone").value,
       place: document.getElementById("pPlace").value,
@@ -571,71 +538,80 @@
     const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     if (!id) {
-      await addDoc(collection(db, "patients"), patientData);
+      patients.push(patientData);
       if(patientData.paid > 0) {
-        await addDoc(collection(db, "transactions"), { title: patientData.name, amount: patientData.paid, date: todayStr, type: 'income' });
+        transactions.push({ id: 't_' + Date.now(), title: patientData.name, amount: patientData.paid, date: todayStr, type: 'income' });
       }
     } else {
-      await setDoc(doc(db, "patients", id), patientData);
+      const index = patients.findIndex(item => item.id === id);
+      if(index !== -1) patients[index] = patientData;
     }
-    window.closeModals();
+    saveData();
+    closeModals();
   };
 
-  document.getElementById("scheduleForm").onsubmit = async function(e) {
+  document.getElementById("scheduleForm").onsubmit = function(e) {
     e.preventDefault();
     const id = document.getElementById("sId").value;
     const scheduleData = {
+      id: id ? id : 's_' + Date.now(),
       name: document.getElementById("sName").value,
       date: document.getElementById("sDate").value,
       time: document.getElementById("sTime").value,
       notes: document.getElementById("sNotes").value
     };
     if (!id) {
-      await addDoc(collection(db, "schedules"), scheduleData);
+      schedules.push(scheduleData);
     } else {
-      await setDoc(doc(db, "schedules", id), scheduleData);
+      const index = schedules.findIndex(item => item.id === id);
+      if(index !== -1) schedules[index] = scheduleData;
     }
-    window.closeModals();
+    saveData();
+    closeModals();
   };
 
-  document.getElementById("expenseForm").onsubmit = async function(e) {
+  document.getElementById("expenseForm").onsubmit = function(e) {
     e.preventDefault();
     const dateVal = document.getElementById("eDate").value;
     const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    await addDoc(collection(db, "expenses"), {
+    expenses.push({
+      id: 'ex_' + Date.now(),
       title: document.getElementById("eTitle").value,
       amount: parseFloat(document.getElementById("eAmount").value) || 0,
       date: formattedDate
     });
-    window.closeModals();
+    saveData();
+    closeModals();
   };
 
-  document.getElementById("transactionForm").onsubmit = async function(e) {
+  document.getElementById("transactionForm").onsubmit = function(e) {
     e.preventDefault();
     const dateVal = document.getElementById("tDate").value;
     const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    await addDoc(collection(db, "transactions"), {
+    transactions.push({
+      id: 't_' + Date.now(),
       title: document.getElementById("tTitle").value,
       amount: parseFloat(document.getElementById("tAmount").value) || 0,
       type: 'income',
       date: formattedDate
     });
-    window.closeModals();
+    saveData();
+    closeModals();
   };
 
-  window.openPatientFilterModal = function(type) {
+  function openPatientFilterModal(type) {
     const titleEl = document.getElementById("filterModalTitle");
     const listEl = document.getElementById("filteredPatientList");
     
-    let filtered = window.patients;
+    let filtered = patients;
     if(type === 'Live') {
       titleEl.textContent = "Live Patients List";
-      filtered = window.patients.filter(p => (p.status || 'Live') === 'Live');
+      filtered = patients.filter(p => (p.status || 'Live') === 'Live');
     } else if(type === 'Discharged') {
       titleEl.textContent = "Discharged Patients List";
-      filtered = window.patients.filter(p => p.status === 'Discharged');
+      filtered = patients.filter(p => p.status === 'Discharged');
     } else {
       titleEl.textContent = "Total Patients List";
     }
@@ -647,22 +623,22 @@
       
       listEl.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="window.closeModals(); window.editPatient('${p.id}');">
+          <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient('${p.id}');">
             <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; ${statusBadgeColor}">(${escapeHTML(p.status || 'Live')})</span><br>
             <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small>
             ${dischargeInfo}
           </div>
           <div>
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.closeModals(); window.editPatient('${p.id}');">Edit</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="closeModals(); editPatient('${p.id}');">Edit</button>
           </div>
         </div>
       `;
     });
 
     document.getElementById("patientFilterModal").style.display = "flex";
-  };
+  }
 
-  window.openAddPatientModal = function() {
+  function openAddPatientModal() {
     document.getElementById("patientModalTitle").textContent = "Add New Patient";
     document.getElementById("pId").value = "";
     document.getElementById("pName").value = "";
@@ -675,10 +651,10 @@
     document.getElementById("pStartDate").value = "";
     document.getElementById("pEndDate").value = "";
     document.getElementById("patientModal").style.display = "flex";
-  };
+  }
 
-  window.editPatient = function(id) {
-    const p = window.patients.find(item => item.id === id);
+  function editPatient(id) {
+    const p = patients.find(item => item.id === id);
     if(!p) return;
     document.getElementById("patientModalTitle").textContent = "Edit Patient & Discharge Details";
     document.getElementById("pId").value = p.id;
@@ -692,15 +668,16 @@
     document.getElementById("pStartDate").value = p.startDate || "";
     document.getElementById("pEndDate").value = p.endDate || "";
     document.getElementById("patientModal").style.display = "flex";
-  };
+  }
 
-  window.deletePatient = async function(id) {
+  function deletePatient(id) {
     if (confirm("Delete this patient?")) {
-      await deleteDoc(doc(db, "patients", id));
+      patients = patients.filter(item => item.id !== id);
+      saveData();
     }
-  };
+  }
 
-  window.openAddScheduleModal = function() {
+  function openAddScheduleModal() {
     document.getElementById("scheduleModalTitle").textContent = "Add Schedule";
     document.getElementById("sId").value = "";
     document.getElementById("sName").value = "";
@@ -708,10 +685,10 @@
     document.getElementById("sTime").value = "";
     document.getElementById("sNotes").value = "";
     document.getElementById("scheduleModal").style.display = "flex";
-  };
+  }
 
-  window.editSchedule = function(id) {
-    const s = window.schedules.find(item => item.id === id);
+  function editSchedule(id) {
+    const s = schedules.find(item => item.id === id);
     if(!s) return;
     document.getElementById("scheduleModalTitle").textContent = "Edit Schedule";
     document.getElementById("sId").value = s.id;
@@ -720,45 +697,48 @@
     document.getElementById("sTime").value = s.time || "";
     document.getElementById("sNotes").value = s.notes || "";
     document.getElementById("scheduleModal").style.display = "flex";
-  };
+  }
 
-  window.deleteSchedule = async function(id) {
+  function deleteSchedule(id) {
     if (confirm("Delete this schedule?")) {
-      await deleteDoc(doc(db, "schedules", id));
+      schedules = schedules.filter(item => item.id !== id);
+      saveData();
     }
-  };
+  }
 
-  window.openAddExpenseModal = function() {
+  function openAddExpenseModal() {
     document.getElementById("eTitle").value = "";
     document.getElementById("eAmount").value = "";
     document.getElementById("eDate").value = new Date().toISOString().split('T')[0];
     document.getElementById("expenseModal").style.display = "flex";
-  };
+  }
 
-  window.openAddTransactionModal = function() {
+  function openAddTransactionModal() {
     document.getElementById("tTitle").value = "";
     document.getElementById("tAmount").value = "";
     document.getElementById("tDate").value = new Date().toISOString().split('T')[0];
     document.getElementById("transactionModal").style.display = "flex";
-  };
+  }
 
-  window.deleteExpense = async function(id) {
-    await deleteDoc(doc(db, "expenses", id));
-  };
+  function deleteExpense(id) {
+    expenses = expenses.filter(item => item.id !== id);
+    saveData();
+  }
 
-  window.deleteTransaction = async function(id) {
-    await deleteDoc(doc(db, "transactions", id));
-  };
+  function deleteTransaction(id) {
+    transactions = transactions.filter(item => item.id !== id);
+    saveData();
+  }
 
-  window.closeModals = function() {
+  function closeModals() {
     document.getElementById("patientModal").style.display = "none";
     document.getElementById("scheduleModal").style.display = "none";
     document.getElementById("expenseModal").style.display = "none";
     document.getElementById("transactionModal").style.display = "none";
     document.getElementById("patientFilterModal").style.display = "none";
-  };
+  }
 
-  window.switchPnlTab = function(tabName) {
+  function switchPnlTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
@@ -769,51 +749,51 @@
       document.getElementById('expTabBtn').classList.add('active');
       document.getElementById('expenseTabContent').classList.add('active');
     }
-  };
+  }
 
   function getFinancials() {
-    let totalCollection = window.transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-    let totalExpense = window.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    let totalCollection = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+    let totalExpense = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
     let netProfit = totalCollection - totalExpense;
     return { totalCollection, totalExpense, netProfit };
   }
 
   function renderAllData() {
     const pContainer = document.getElementById("patient-list-container");
-    pContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No patients added yet.</p>" : "";
-    window.patients.forEach((p) => {
+    pContainer.innerHTML = patients.length === 0 ? "<p style='color:#777;'>No patients added yet.</p>" : "";
+    patients.forEach((p) => {
       let feeVal = p.fee !== undefined ? p.fee : 0;
       let paidVal = p.paid !== undefined ? p.paid : 0;
       let due = feeVal - paidVal;
       
       pContainer.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="window.editPatient('${p.id}')">
+          <div style="flex:1; cursor:pointer;" onclick="editPatient('${p.id}')">
             <strong>${escapeHTML(p.name)}</strong> (${escapeHTML(p.status || 'Live')})<br>
             <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small><br>
             <small style="color:#4caf50;">Paid: ₹${paidVal}</small> | <small style="color:${due > 0 ? '#f44336':'#aaa'};">Due: ₹${due}</small>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.editPatient('${p.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" onclick="window.deletePatient('${p.id}')">Del</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editPatient('${p.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" onclick="deletePatient('${p.id}')">Del</button>
           </div>
         </div>
       `;
     });
 
     const sContainer = document.getElementById("schedules-list");
-    sContainer.innerHTML = window.schedules.length === 0 ? "<p style='color:#777;'>No schedules available.</p>" : "";
-    window.schedules.forEach((s) => {
+    sContainer.innerHTML = schedules.length === 0 ? "<p style='color:#777;'>No schedules available.</p>" : "";
+    schedules.forEach((s) => {
       sContainer.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="window.editSchedule('${s.id}')">
+          <div style="flex:1; cursor:pointer;" onclick="editSchedule('${s.id}')">
             <strong>${escapeHTML(s.name)}</strong><br>
             <small style="color:#aaa;">📅 ${escapeHTML(s.date || 'No Date')} | ⏰ ${escapeHTML(s.time || 'No Time')}</small>
             <p style="margin:4px 0 0 0; font-size:13px; color:#ddd;">Rehab: ${escapeHTML(s.notes || 'None')}</p>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.editSchedule('${s.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" onclick="window.deleteSchedule('${s.id}')">Del</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editSchedule('${s.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" onclick="deleteSchedule('${s.id}')">Del</button>
           </div>
         </div>
       `;
@@ -829,33 +809,33 @@
       </div>
 
       <div class="tab-container">
-        <button id="colTabBtn" class="tab-btn active" onclick="window.switchPnlTab('collection')">Collection</button>
-        <button id="expTabBtn" class="tab-btn" onclick="window.switchPnlTab('expense')">Expense</button>
+        <button id="colTabBtn" class="tab-btn active" onclick="switchPnlTab('collection')">Collection</button>
+        <button id="expTabBtn" class="tab-btn" onclick="switchPnlTab('expense')">Expense</button>
       </div>
 
       <div id="collectionTabContent" class="tab-content active">
-        ${window.transactions.length === 0 ? "<p style='color:#777; text-align:center;'>No collection records.</p>" : ""}
-        ${window.transactions.map((t) => `
+        ${transactions.length === 0 ? "<p style='color:#777; text-align:center;'>No collection records.</p>" : ""}
+        ${transactions.map((t) => `
           <div class="pnl-row">
             <span style="color:var(--text-muted); font-size:13px;">${escapeHTML(t.date || 'N/A')}</span>
             <span style="font-weight:600;">${escapeHTML(t.title || 'Income')}</span>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="color:var(--accent-green); font-weight:bold;">${t.amount}</span>
-              <button class="proliv-btn proliv-btn-danger" onclick="window.deleteTransaction('${t.id}')">X</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="deleteTransaction('${t.id}')">X</button>
             </div>
           </div>
         `).join('')}
       </div>
 
       <div id="expenseTabContent" class="tab-content">
-        ${window.expenses.length === 0 ? "<p style='color:#777; text-align:center;'>No expense records.</p>" : ""}
-        ${window.expenses.map((e) => `
+        ${expenses.length === 0 ? "<p style='color:#777; text-align:center;'>No expense records.</p>" : ""}
+        ${expenses.map((e) => `
           <div class="pnl-row">
             <span style="color:var(--text-muted); font-size:13px;">${escapeHTML(e.date || 'N/A')}</span>
             <span style="font-weight:600;">${escapeHTML(e.title || 'Expense')}</span>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="color:var(--accent-red); font-weight:bold;">${e.amount}</span>
-              <button class="proliv-btn proliv-btn-danger" onclick="window.deleteExpense('${e.id}')">X</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="deleteExpense('${e.id}')">X</button>
             </div>
           </div>
         `).join('')}
@@ -866,10 +846,10 @@
   }
 
   function updateDashboardStats() {
-    const liveCount = window.patients.filter(p => (p.status || 'Live') === "Live").length;
-    const totalCount = window.patients.length;
-    const dischargedCount = window.patients.filter(p => p.status === "Discharged").length;
-    const schedCount = window.schedules.length;
+    const liveCount = patients.filter(p => (p.status || 'Live') === "Live").length;
+    const totalCount = patients.length;
+    const dischargedCount = patients.filter(p => p.status === "Discharged").length;
+    const schedCount = schedules.length;
     const fin = getFinancials();
 
     document.getElementById("statLive").textContent = liveCount;
@@ -883,7 +863,7 @@
     document.getElementById("navScheduleBadge").textContent = schedCount;
   }
 
-  window.openSection = function(sectionId) {
+  function openSection(sectionId) {
     document.querySelectorAll(".section-box").forEach(function (box) {
       box.style.display = "none";
     });
@@ -895,7 +875,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  window.goHome = function() {
+  function goHome() {
     document.querySelectorAll(".section-box").forEach(function (box) {
       box.style.display = "none";
     });
@@ -903,6 +883,9 @@
     document.querySelector(".stats-grid").style.display = "grid";
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  // Initial render on load
+  renderAllData();
 </script>
 </body>
 </html>
