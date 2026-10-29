@@ -225,10 +225,17 @@
 <body>
 
 <div class="container">
-  <!-- Brand Header -->
-  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-    <div style="background: var(--accent-red); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">P</div>
-    <h2 style="margin: 0; font-size: 20px;">PROLIV PHYSIO</h2>
+  <!-- Brand Header with Backup Options -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="background: var(--accent-red); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">P</div>
+      <h2 style="margin: 0; font-size: 20px;">PROLIV PHYSIO</h2>
+    </div>
+    <div>
+      <button class="proliv-btn" style="padding: 6px 10px; font-size: 12px;" onclick="exportBackup()">📥 Backup</button>
+      <button class="proliv-btn proliv-btn-secondary" style="padding: 6px 10px; font-size: 12px;" onclick="document.getElementById('importFile').click()">📤 Restore</button>
+      <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(event)">
+    </div>
   </div>
 
   <!-- Dashboard Overview Stats (Clickable) -->
@@ -498,6 +505,53 @@
       updateDashboardStats();
     }
 
+    // Backup Export Function
+    window.exportBackup = function() {
+      const backupData = {
+        patients: window.patients,
+        schedules: window.schedules,
+        expenses: window.expenses,
+        transactions: window.transactions,
+        version: "1.0",
+        date: new Date().toISOString()
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "proliv_physio_backup_" + new Date().toISOString().split('T')[0] + ".json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    };
+
+    // Backup Import Function
+    window.importBackup = function(event) {
+      const fileReader = new FileReader();
+      if(event.target.files[0]) {
+        fileReader.readAsText(event.target.files[0], "UTF-8");
+        fileReader.onload = function(e) {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if(parsed.patients || parsed.expenses) {
+              if(confirm("ഇത് നിലവിലുള്ള ഡാറ്റ പുതിയ ബാക്കപ്പ് ഫയൽ ഉപയോഗിച്ച് റീപ്ലേസ് ചെയ്യും. തുടരണോ?")) {
+                window.patients = parsed.patients || [];
+                window.schedules = parsed.schedules || [];
+                window.expenses = parsed.expenses || [];
+                window.transactions = parsed.transactions || [];
+                saveData();
+                renderAllData();
+                alert("ഡാറ്റ വിജയകരമായി റെസ്റ്റോർ (Restore) ചെയ്തു!");
+              }
+            } else {
+              alert("തെറ്റായ ബാക്കപ്പ് ഫയൽ ഫോർമാറ്റ്!");
+            }
+          } catch(err) {
+            alert("ഫയൽ റീഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു: " + err);
+          }
+        };
+      }
+    };
+
     // Forms Handlers
     document.getElementById("patientForm").onsubmit = function(e) {
       e.preventDefault();
@@ -572,7 +626,7 @@
       saveData(); closeModals(); renderAllData();
     };
 
-    // Filter Popup for Patient Counts
+    // Filter Popup for Patient Counts (Live, Total, Discharged)
     window.openPatientFilterModal = function(type) {
       const titleEl = document.getElementById("filterModalTitle");
       const listEl = document.getElementById("filteredPatientList");
@@ -590,11 +644,15 @@
 
       listEl.innerHTML = filtered.length === 0 ? "<p style='color:#777; text-align:center;'>No patients found.</p>" : "";
       filtered.forEach((p) => {
+        let actualIdx = window.patients.indexOf(p);
         listEl.innerHTML += `
           <div class="card-item">
-            <div>
+            <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient(${actualIdx});">
               <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; color:var(--text-muted);">(${escapeHTML(p.status || 'Live')})</span><br>
               <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small>
+            </div>
+            <div>
+              <button class="proliv-btn" style="padding:4px 8px; font-size:11px;" onclick="closeModals(); editPatient(${actualIdx});">Edit</button>
             </div>
           </div>
         `;
@@ -840,22 +898,4 @@
       document.getElementById("proliv-section-navigation").style.display = "none";
       document.querySelector(".stats-grid").style.display = "none";
       
-      const selected = document.getElementById(sectionId);
-      if (selected) selected.style.display = "block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    window.goHome = function() {
-      document.querySelectorAll(".section-box").forEach(function (box) {
-        box.style.display = "none";
-      });
-      document.getElementById("proliv-section-navigation").style.display = "grid";
-      document.querySelector(".stats-grid").style.display = "grid";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    renderAllData();
-  })();
-</script>
-</body>
-</html>
+      ...
