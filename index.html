@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physiocare - PGM Fitness</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header style="background-color: #0d9488;">
+            <h1>Physiocare</h1>
+            <p>Physiotherapy Section - PGM Fitness</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>Add New Patient</h2>
+                <form id="physioForm">
+                    <input type="text" id="patientName" placeholder="Patient Name" required style="width:100%; padding:8px; margin-bottom:10px;">
+                    <input type="text" id="injuryType" placeholder="Injury / Pain Details" required style="width:100%; padding:8px; margin-bottom:10px;">
+                    <input type="date" id="visitDate" required style="width:100%; padding:8px; margin-bottom:10px;">
+                    <button type="submit" style="background:#0d9488; color:white; padding:10px; border:none; width:100%; border-radius:4px;">Save Patient</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Patient List</h2>
+                <ul id="patientList" style="list-style:none; padding:0;">
+                    <!-- Patients will be listed here -->
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="physio.js"></script>
+</body>
+</html>
 
