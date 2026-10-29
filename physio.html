@@ -1,4 +1,4 @@
-<!-- PROLIV PHYSIO APP NAVIGATION + CARD LAYOUT -->
+<!-- PROLIV PHYSIO APP NAVIGATION + CARD LAYOUT WITH PATIENT DETAILS, SCHEDULING & P&L -->
 <style>
   .section-box {
     display: none;
@@ -8,23 +8,16 @@
     padding: 14px;
     margin: 14px 0;
     box-shadow: 0 4px 14px rgba(0, 0, 0, .2);
+    color: #fff;
   }
 
   .section-box .section-header {
     margin: 12px 0;
     padding-bottom: 12px;
     border-bottom: 1px solid #333;
-    gap: 8px;
-  }
-
-  .section-box .member-card,
-  .section-box .list-item {
-    border-radius: 14px;
-    margin-bottom: 10px;
-  }
-
-  .section-box .data-list {
-    gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .section-home-btn {
@@ -52,15 +45,77 @@
     border-color: var(--red-accent, #d32f2f);
   }
 
-  .section-nav-card:focus-visible {
-    outline: 2px solid #d32f2f;
-    outline-offset: 3px;
+  /* Modal / Detail View Styles */
+  .proliv-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .proliv-modal-content {
+    background: #1c1c1e;
+    border: 1px solid #444;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    color: #fff;
+  }
+  .proliv-form-group {
+    margin-bottom: 12px;
+  }
+  .proliv-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #aaa;
+  }
+  .proliv-form-group input, .proliv-form-group select, .proliv-form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #2a2a2e;
+    color: #fff;
+  }
+  .proliv-btn {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .proliv-btn-secondary {
+    background: #444;
+  }
+  .patient-item-card {
+    background: #252528;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #333;
   }
 </style>
 
 <script>
 (function () {
   "use strict";
+
+  // Ensure global data store
+  window.patients = window.patients || [];
+  window.expenses = window.expenses || [];
 
   const sectionDefinitions = [
     {
@@ -100,10 +155,9 @@
       return;
     }
 
-    // Prevent duplicate initialization.
     if (document.getElementById("proliv-section-navigation")) return;
 
-    // Build the three navigation cards.
+    // Build Navigation Cards
     const navigation = document.createElement("div");
     navigation.id = "proliv-section-navigation";
     navigation.className = "grid section-nav";
@@ -119,42 +173,28 @@
       card.innerHTML = `
         <div class="card-icon">${section.icon}</div>
         <div class="card-label">${section.label}</div>
-        <div class="pill-badge ${
-          index === 1 ? "dark" : index === 2 ? "green" : ""
-        }">${section.badge}</div>
+        <div class="pill-badge ${index === 1 ? "dark" : index === 2 ? "green" : ""}">${section.badge}</div>
       `;
 
       card.addEventListener("click", function () {
         openSection(section.id);
       });
 
-      card.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openSection(section.id);
-        }
-      });
-
       navigation.appendChild(card);
     });
 
-    // Place navigation above the existing dashboard.
     dashboard.parentNode.insertBefore(navigation, dashboard);
 
-    // Wrap each existing section without changing its list IDs.
+    // Wrap sections & Add Add Action Buttons
     sectionDefinitions.forEach(function (section) {
       const header = document.getElementById(section.headerId);
       const content = document.getElementById(section.contentId);
 
-      if (!header || !content) {
-        console.warn("Section elements missing:", section.id);
-        return;
-      }
+      if (!header || !content) return;
 
       const box = document.createElement("section");
       box.id = section.id;
       box.className = "section-box";
-      box.setAttribute("aria-label", section.title);
 
       const homeButton = document.createElement("button");
       homeButton.type = "button";
@@ -163,13 +203,30 @@
       homeButton.addEventListener("click", goHome);
 
       header.parentNode.insertBefore(box, header);
-
       box.appendChild(homeButton);
       box.appendChild(header);
+
+      // Add specific action buttons based on section
+      if (section.id === "patients-box") {
+        const addBtn = document.createElement("button");
+        addBtn.className = "proliv-btn";
+        addBtn.style.margin = "10px 0";
+        addBtn.textContent = "+ Add New Patient";
+        addBtn.onclick = openAddPatientModal;
+        box.appendChild(addBtn);
+      } else if (section.id === "fees-box") {
+        const addExpBtn = document.createElement("button");
+        addExpBtn.className = "proliv-btn proliv-btn-secondary";
+        addExpBtn.style.margin = "10px 0";
+        addExpBtn.textContent = "+ Add Expense";
+        addExpBtn.onclick = openAddExpenseModal;
+        box.appendChild(addExpBtn);
+      }
+
       box.appendChild(content);
     });
 
-    // Add patient count to the navigation card.
+    // Patient Count Badge
     const patientCount = document.createElement("span");
     patientCount.id = "proliv-nav-patient-count";
     patientCount.className = "pill-badge";
@@ -177,773 +234,234 @@
 
     const patientCard = navigation.children[0];
     const oldBadge = patientCard.querySelector(".pill-badge");
+    if (oldBadge) oldBadge.replaceWith(patientCount);
 
-    if (oldBadge) {
-      oldBadge.replaceWith(patientCount);
+    createModals();
+    updateNavigationPatientCount();
+    renderProlivData();
+    goHome();
+  }
+
+  // Create Modals for Patient Add/Edit & Expenses
+  function createModals() {
+    if (document.getElementById("proliv-dynamic-modals")) return;
+
+    const modalContainer = document.createElement("div");
+    modalContainer.id = "proliv-dynamic-modals";
+    modalContainer.innerHTML = `
+      <div id="patientModal" class="proliv-modal">
+        <div class="proliv-modal-content">
+          <h3 id="modalTitle">Patient Details</h3>
+          <form id="patientForm">
+            <input type="hidden" id="pIndex">
+            <div class="proliv-form-group">
+              <label>Patient Name</label>
+              <input type="text" id="pName" required>
+            </div>
+            <div class="proliv-form-group">
+              <label>Appointment Time / Schedule</label>
+              <input type="time" id="pTime" required>
+            </div>
+            <div class="proliv-form-group">
+              <label>Rehab Status / Notes</label>
+              <textarea id="pRehab" rows="3"></textarea>
+            </div>
+            <div class="proliv-form-group">
+              <label>Fee Amount (₹)</label>
+              <input type="number" id="pFee" value="0">
+            </div>
+            <div class="proliv-form-group">
+              <label>Status</label>
+              <select id="pStatus">
+                <option value="Live">Live</option>
+                <option value="Discharged">Discharged</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+              <button type="submit" class="proliv-btn">Save Patient</button>
+              <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="expenseModal" class="proliv-modal">
+        <div class="proliv-modal-content">
+          <h3>Add Clinic Expense</h3>
+          <form id="expenseForm">
+            <div class="proliv-form-group">
+              <label>Expense Title / Reason</label>
+              <input type="text" id="eTitle" required>
+            </div>
+            <div class="proliv-form-group">
+              <label>Amount (₹)</label>
+              <input type="number" id="eAmount" required>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+              <button type="submit" class="proliv-btn">Add Expense</button>
+              <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalContainer);
+
+    // Form Submissions
+    document.getElementById("patientForm").onsubmit = function(e) {
+      e.preventDefault();
+      const index = document.getElementById("pIndex").value;
+      const patientData = {
+        name: document.getElementById("pName").value,
+        time: document.getElementById("pTime").value,
+        rehab: document.getElementById("pRehab").value,
+        fee: parseFloat(document.getElementById("pFee").value) || 0,
+        status: document.getElementById("pStatus").value
+      };
+
+      if (index === "") {
+        window.patients.push(patientData);
+      } else {
+        window.patients[index] = patientData;
+      }
+
+      closeModals();
+      renderProlivData();
+    };
+
+    document.getElementById("expenseForm").onsubmit = function(e) {
+      e.preventDefault();
+      const expenseData = {
+        title: document.getElementById("eTitle").value,
+        amount: parseFloat(document.getElementById("eAmount").value) || 0,
+        date: new Date().toLocaleDateString()
+      };
+      window.expenses.push(expenseData);
+      closeModals();
+      renderProlivData();
+    };
+  }
+
+  window.openAddPatientModal = function() {
+    document.getElementById("modalTitle").textContent = "Add New Patient";
+    document.getElementById("pIndex").value = "";
+    document.getElementById("pName").value = "";
+    document.getElementById("pTime").value = "";
+    document.getElementById("pRehab").value = "";
+    document.getElementById("pFee").value = "0";
+    document.getElementById("pStatus").value = "Live";
+    document.getElementById("patientModal").style.display = "flex";
+  };
+
+  window.editPatient = function(index) {
+    const p = window.patients[index];
+    document.getElementById("modalTitle").textContent = "Edit Patient Details";
+    document.getElementById("pIndex").value = index;
+    document.getElementById("pName").value = p.name;
+    document.getElementById("pTime").value = p.time || "";
+    document.getElementById("pRehab").value = p.rehab || "";
+    document.getElementById("pFee").value = p.fee || 0;
+    document.getElementById("pStatus").value = p.status || "Live";
+    document.getElementById("patientModal").style.display = "flex";
+  };
+
+  window.openAddExpenseModal = function() {
+    document.getElementById("eTitle").value = "";
+    document.getElementById("eAmount").value = "";
+    document.getElementById("expenseModal").style.display = "flex";
+  };
+
+  window.closeModals = function() {
+    document.getElementById("patientModal").style.display = "none";
+    document.getElementById("expenseModal").style.display = "none";
+  };
+
+  function renderProlivData() {
+    // 1. Render Patients List
+    const pContainer = document.getElementById("patient-list-container");
+    if (pContainer) {
+      pContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No patients added yet.</p>" : "";
+      window.patients.forEach((p, idx) => {
+        pContainer.innerHTML += `
+          <div class="patient-item-card" onclick="editPatient(${idx})">
+            <div>
+              <strong>${p.name}</strong><br>
+              <small style="color:#aaa;">Time: ${p.time || 'Not Set'} | Status: ${p.status}</small>
+            </div>
+            <div><span>👉 Edit</span></div>
+          </div>
+        `;
+      });
+    }
+
+    // 2. Render Schedules List
+    const sContainer = document.getElementById("schedules-list");
+    if (sContainer) {
+      sContainer.innerHTML = window.patients.length === 0 ? "<p style='color:#777;'>No schedules available.</p>" : "";
+      window.patients.forEach((p) => {
+        sContainer.innerHTML += `
+          <div style="background:#252528; padding:10px; border-radius:8px; margin-bottom:8px;">
+            <strong>${p.name}</strong> - ⏰ ${p.time || 'No Time'}
+            <p style="margin:5px 0 0 0; font-size:13px; color:#ccc;">Rehab: ${p.rehab || 'None'}</p>
+          </div>
+        `;
+      });
+    }
+
+    // 3. Render P&L Accounts & Expenses
+    const fContainer = document.getElementById("fees-list");
+    if (fContainer) {
+      let totalCollection = window.patients.reduce((sum, p) => sum + (p.fee || 0), 0);
+      let totalExpense = window.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+      let netProfit = totalCollection - totalExpense;
+
+      fContainer.innerHTML = `
+        <div style="background:#252528; padding:12px; border-radius:8px; margin-bottom:10px;">
+          <p><strong>Total Collection:</strong> ₹${totalCollection}</p>
+          <p><strong>Total Expenses:</strong> ₹${totalExpense}</p>
+          <p style="color: ${netProfit >= 0 ? '#4caf50' : '#f44336'};"><strong>Net Profit:</strong> ₹${netProfit}</p>
+        </div>
+        <h4>Expense History</h4>
+        ${window.expenses.length === 0 ? "<p style='color:#777;'>No expenses recorded.</p>" : ""}
+        ${window.expenses.map(e => `<div style="background:#222; padding:8px; border-radius:6px; margin-bottom:5px; font-size:13px;">${e.title} : <b>₹${e.amount}</b> (${e.date})</div>`).join('')}
+      `;
     }
 
     updateNavigationPatientCount();
-    goHome();
   }
 
   function openSection(sectionId) {
     document.querySelectorAll(".section-box").forEach(function (box) {
       box.style.display = "none";
     });
-
     const selected = document.getElementById(sectionId);
-
-    if (!selected) return;
-
-    selected.style.display = "block";
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    if (selected) selected.style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goHome() {
     document.querySelectorAll(".section-box").forEach(function (box) {
       box.style.display = "none";
     });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function updateNavigationPatientCount() {
-    const countElement = document.getElementById(
-      "proliv-nav-patient-count"
-    );
-
-    if (
-      countElement &&
-      Array.isArray(window.patients)
-    ) {
+    const countElement = document.getElementById("proliv-nav-patient-count");
+    if (countElement && Array.isArray(window.patients)) {
       countElement.textContent = window.patients.length;
     }
   }
 
-  // Make navigation functions available to the app.
   window.openProlivSection = openSection;
   window.goHome = goHome;
   window.updateProlivPatientCount = updateNavigationPatientCount;
 
   if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeProlivCards
-    );
+    document.addEventListener("DOMContentLoaded", initializeProlivCards);
   } else {
     initializeProlivCards();
   }
 })();
 </script>
-<!-- END PROLIV PHYSIO CARD LAYOUT --><!DOCTYPE html>
-<html lang="ml">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROLIV PHYSIO</title>
-    <style>
-        :root {
-            --bg-dark: #121212;
-            --card-bg: #1c1c1e;
-            --text-main: #ffffff;
-            --text-sub: #8e8e93;
-            --red-accent: #d32f2f;
-            --pill-bg-red: #5f1414;
-            --pill-bg-dark: #000000;
-            --accent-green: #00e676;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            padding: 12px;
-            padding-bottom: 90px;
-        }
-
-        /* Top Bar */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 4px 16px 4px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #ff5252, #d32f2f);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .brand-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-        }
-
-        /* 12 Dashboard Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 14px;
-            padding: 12px 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            min-height: 105px;
-            border: 1px solid #2a2a2c;
-            cursor: pointer;
-        }
-
-        .card-icon { font-size: 1.3rem; margin-bottom: 4px; }
-
-        .card-label {
-            font-size: 0.65rem;
-            color: #d1d1d6;
-            font-weight: 600;
-            line-height: 1.2;
-            margin-bottom: 6px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pill-badge {
-            background-color: var(--pill-bg-red);
-            color: #ff8a80;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 3px 10px;
-            border-radius: 12px;
-            min-width: 45px;
-        }
-
-        .pill-badge.dark {
-            background-color: var(--pill-bg-dark);
-            color: var(--text-main);
-            border: 1px solid #3a3a3c;
-        }
-
-        .pill-badge.green {
-            background-color: #0d381e;
-            color: var(--accent-green);
-        }
-
-        /* Section Titles */
-        .section-header {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin: 20px 4px 10px 4px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Patient Cards */
-        .member-card {
-            background-color: var(--card-bg);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #2a2a2c;
-        }
-
-        .member-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 12px;
-        }
-
-        .member-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #2c2c2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ff8a80;
-            border: 1px solid #3a3a3c;
-        }
-
-        .member-details { flex: 1; }
-        .member-name { font-size: 1rem; font-weight: bold; color: var(--text-main); margin-bottom: 2px; }
-        .member-sub { font-size: 0.75rem; color: var(--text-sub); }
-        .member-phone { font-size: 0.82rem; color: #29b6f6; margin-top: 2px; font-weight: 600; }
-
-        .member-grid {
-            background: #161618;
-            padding: 10px 12px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .mg-row { display: flex; justify-content: space-between; }
-        .mg-item { flex: 1; display: flex; flex-direction: column; }
-        .mg-label { color: var(--text-sub); font-size: 0.68rem; }
-        .mg-val { font-weight: bold; font-size: 0.82rem; color: var(--text-main); margin-top: 2px; }
-
-        .member-actions {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #2c2c2e;
-            padding-top: 10px;
-        }
-
-        .action-icon-btn {
-            background: none;
-            border: none;
-            color: var(--text-sub);
-            font-size: 0.7rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-        }
-
-        /* Lists */
-        .data-list { display: flex; flex-direction: column; gap: 8px; }
-        .list-item {
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #2a2a2c;
-        }
-
-        .btn-sm {
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.75rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btn-edit { background: #3a3a3c; color: #fff; }
-        .btn-del { background: #5f1414; color: #ff8a80; }
-
-        /* Floating Action Button */
-        .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: var(--red-accent);
-            color: #ffffff;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(213, 47, 47, 0.5);
-            cursor: pointer;
-            border: none;
-            z-index: 99;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            width: 100%;
-            max-width: 500px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 20px;
-            border-top: 1px solid #3a3a3c;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            background: #2c2c2e;
-            border: 1px solid #3a3a3c;
-            color: #fff;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-
-        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-        .btn-full { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-save { background: var(--red-accent); color: #fff; }
-        .btn-cancel { background: #3a3a3c; color: #fff; }
-
-        /* Report View List Styling */
-        .report-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #2a2a2c;
-            font-size: 0.88rem;
-        }
-        .report-date { color: var(--text-sub); font-size: 0.78rem; width: 90px; }
-        .report-name { font-weight: 600; color: #ffffff; flex: 1; text-align: center; }
-        .report-val { font-weight: bold; color: var(--accent-green); width: 80px; text-align: right; }
-    </style>
-</head>
-<body>
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="brand">
-            <div class="brand-logo">P</div>
-            <div class="brand-title">PROLIV PHYSIO</div>
-        </div>
-        <div class="top-icons">
-            <button class="action-icon-btn" onclick="openPatientModal()"><span>👤+</span></button>
-            <button class="action-icon-btn" onclick="showReport('P&L')"><span>📈</span></button>
-        </div>
-    </div>
-
-    <!-- 12 Dashboard Grid -->
-    <div class="grid">
-        <!-- Row 1 -->
-        <div class="card" onclick="showReport('Live Patients')">
-            <div class="card-icon">👥</div>
-            <div class="card-label">Live Patients</div>
-            <div class="pill-badge" id="val-activePatients">0</div>
-        </div>
-        <div class="card" onclick="showReport('Total Patients')">
-            <div class="card-icon">🔍</div>
-            <div class="card-label">Total Patients</div>
-            <div class="pill-badge dark" id="val-totalPatients">0</div>
-        </div>
-        <div class="card" onclick="showReport('Discharged')">
-            <div class="card-icon">👤❌</div>
-            <div class="card-label">Discharged</div>
-            <div class="pill-badge dark" id="val-dischargedCount">0</div>
-        </div>
-
-        <!-- Row 2 -->
-        <div class="card" onclick="showReport('Rehab')">
-            <div class="card-icon">🕒</div>
-            <div class="card-label">Rehab (1-3 Days)</div>
-            <div class="pill-badge" id="val-rehabCount">0</div>
-        </div>
-        <div class="card" onclick="showReport('Follow-up Due')">
-            <div class="card-icon">⏰</div>
-            <div class="card-label">Follow-up Due</div>
-            <div class="pill-badge" id="val-followUpCount">0</div>
-        </div>
-        <div class="card" onclick="showReport('Scheduled')">
-            <div class="card-icon">📅</div>
-            <div class="card-label">Scheduled</div>
-            <div class="pill-badge dark" id="val-scheduledCount">0</div>
-        </div>
-
-        <!-- Row 3 -->
-        <div class="card" onclick="showReport('Total Collection')">
-            <div class="card-icon">💰</div>
-            <div class="card-label">Total Collection</div>
-            <div class="pill-badge green" id="val-totalCollection">₹0</div>
-        </div>
-        <div class="card" onclick="showReport('Due Amount')">
-            <div class="card-icon">👛</div>
-            <div class="card-label">Due Amount</div>
-            <div class="pill-badge" id="val-dueAmount">₹0</div>
-        </div>
-        <div class="card" onclick="showReport('Total Expense')">
-            <div class="card-icon">💸</div>
-            <div class="card-label">Total Expense</div>
-            <div class="pill-badge" id="val-totalExpense">₹0</div>
-        </div>
-
-        <!-- Row 4 -->
-        <div class="card" onclick="showReport('P&L')">
-            <div class="card-icon">📊</div>
-            <div class="card-label">Net Profit</div>
-            <div class="pill-badge green" id="val-netProfit">₹0</div>
-        </div>
-        <div class="card" onclick="showReport('Scheduled')">
-            <div class="card-icon">🗓️</div>
-            <div class="card-label">Today's Sessions</div>
-            <div class="pill-badge dark" id="val-todaySessions">0</div>
-        </div>
-        <div class="card" onclick="showReport('Total Collection')">
-            <div class="card-icon">🧾</div>
-            <div class="card-label">Total Entries</div>
-            <div class="pill-badge dark" id="val-totalEntries">0</div>
-        </div>
-    </div>
-
-    <!-- Patients List -->
-    <div class="section-header" id="patients-sec">
-        <span>PATIENTS LIST</span>
-        <button class="btn-sm btn-edit" onclick="openPatientModal()">+ Add Patient</button>
-    </div>
-    <div id="patient-list-container"></div>
-
-    <!-- Schedules Section -->
-    <div class="section-header" id="schedules-sec">
-        <span>SCHEDULES & REHAB</span>
-        <button class="btn-sm btn-edit" onclick="openScheduleModal()">+ Schedule</button>
-    </div>
-    <div class="data-list" id="schedules-list"></div>
-
-    <!-- Fees Section -->
-    <div class="section-header" id="fees-sec">
-        <span>FEES & ACCOUNTS (P&L)</span>
-        <button class="btn-sm btn-edit" onclick="openFeeModal()">+ Entry</button>
-    </div>
-    <div class="data-list" id="fees-list"></div>
-
-    <!-- Floating Action Button -->
-    <button class="fab" onclick="openPatientModal()">+</button>
-
-    <!-- Modal Popup Form -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-title" id="modal-title">Details</div>
-            <div id="modal-body"></div>
-            <div class="modal-actions" id="modal-actions">
-                <button class="btn-full btn-cancel" onclick="closeModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let patients = JSON.parse(localStorage.getItem('proliv_patients')) || [
-            { name: "Sudheesh", location: "Calicut", phone: "9876543210", plan: "Therapy", finalAmt: 350, paid: 330, due: 20, startDate: "Oct 27, 2026", endDate: "Nov 27, 2026", status: "Active" },
-            { name: "Fathima hannath", location: "Calicut", phone: "6282944060", plan: "Basic Pack", finalAmt: 2000, paid: 2000, due: 0, startDate: "Oct 27, 2026", endDate: "Nov 25, 2026", status: "Active" },
-            { name: "Shyamjith", location: "Calicut", phone: "9496342522", plan: "Couple Pack", finalAmt: 3500, paid: 3500, due: 0, startDate: "Oct 27, 2026", endDate: "Jan 24, 2027", status: "Rehab" }
-        ];
-
-        let schedules = JSON.parse(localStorage.getItem('proliv_schedules')) || [];
-        let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [
-            { name: "Sudheesh", type: "Income", amount: 330, date: "Oct 27, 2026" },
-            { name: "Fathima hannath", type: "Income", amount: 2000, date: "Oct 27, 2026" },
-            { name: "Shyamjith", type: "Income", amount: 3500, date: "Oct 27, 2026" }
-        ];
-
-        let currentType = '';
-        let editIndex = -1;
-
-        function updateDashboard() {
-            let activePatients = patients.filter(p => p.status === 'Active').length;
-            let discharged = patients.filter(p => p.status === 'Discharged').length;
-            let rehab = patients.filter(p => p.status === 'Rehab').length;
-            let followUp = schedules.filter(s => s.status === 'Follow-up').length;
-            
-            let totalIncome = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.amount), 0);
-            let totalExpense = transactions.filter(t => t.type === 'Expense').reduce((a, b) => a + Number(b.amount), 0);
-            let totalDue = patients.reduce((a, b) => a + Number(b.due || 0), 0);
-            let netProfit = totalIncome - totalExpense;
-
-            document.getElementById('val-activePatients').innerText = activePatients;
-            document.getElementById('val-totalPatients').innerText = patients.length;
-            document.getElementById('val-dischargedCount').innerText = discharged;
-            document.getElementById('val-rehabCount').innerText = rehab;
-            document.getElementById('val-followUpCount').innerText = followUp;
-            document.getElementById('val-scheduledCount').innerText = schedules.length;
-
-            document.getElementById('val-totalCollection').innerText = '₹' + totalIncome;
-            document.getElementById('val-dueAmount').innerText = '₹' + totalDue;
-            document.getElementById('val-totalExpense').innerText = '₹' + totalExpense;
-
-            document.getElementById('val-netProfit').innerText = '₹' + netProfit;
-            document.getElementById('val-todaySessions').innerText = schedules.length;
-            document.getElementById('val-totalEntries').innerText = transactions.length;
-
-            // Render Patients
-            let pContainer = document.getElementById('patient-list-container');
-            pContainer.innerHTML = patients.length === 0 ? '<div class="list-item"><span class="item-sub">രോഗികളുടെ വിവരങ്ങൾ ചേർത്തിട്ടില്ല</span></div>' :
-                patients.map((p, i) => `
-                <div class="member-card">
-                    <div class="member-header">
-                        <div class="member-avatar">${p.name.charAt(0)}</div>
-                        <div class="member-details">
-                            <div class="member-name">${p.name}</div>
-                            <div class="member-sub">${p.location || 'Calicut'}</div>
-                            <div class="member-phone">${p.phone || 'No Number'}</div>
-                        </div>
-                    </div>
-                    <div class="member-grid">
-                        <div class="mg-row">
-                            <div class="mg-item"><span class="mg-label">Join Date</span><span class="mg-val">${p.startDate || 'Oct 27, 2026'}</span></div>
-                            <div class="mg-item"><span class="mg-label">End Date</span><span class="mg-val">${p.endDate || 'Nov 27, 2026'}</span></div>
-                        </div>
-                        <div class="mg-row">
-                            <div class="mg-item"><span class="mg-label">Plan</span><span class="mg-val">${p.plan || 'Therapy'}</span></div>
-                            <div class="mg-item"><span class="mg-label">Final Amt</span><span class="mg-val">₹${p.finalAmt || 0}</span></div>
-                        </div>
-                        <div class="mg-row">
-                            <div class="mg-item"><span class="mg-label">Paid Amt</span><span class="mg-val" style="color:#00e676">₹${p.paid || 0}</span></div>
-                            <div class="mg-item"><span class="mg-label">Due</span><span class="mg-val" style="color:${p.due > 0 ? '#ef5350' : '#00e676'}">₹${p.due || 0}</span></div>
-                        </div>
-                    </div>
-                    <div class="member-actions">
-                        <button class="action-icon-btn" onclick="viewPatientCard(${i})"><span>👤</span>Profile</button>
-                        <button class="action-icon-btn" onclick="openPatientModal(${i})"><span>✏️</span>Edit</button>
-                        <button class="action-icon-btn" onclick="deletePatient(${i})" style="color:#ef5350;"><span>❌</span>Delete</button>
-                    </div>
-                </div>`).join('');
-
-            // Render Schedules
-            let sList = document.getElementById('schedules-list');
-            sList.innerHTML = schedules.length === 0 ? '<div class="list-item"><span class="item-sub">ഷെഡ്യൂളുകൾ ഒന്നും നിലവിലില്ല</span></div>' :
-                schedules.map((s, i) => `
-                <div class="list-item">
-                    <div>
-                        <div style="font-weight:bold;">${s.patientName}</div>
-                        <div style="font-size:0.75rem; color:#888;">${s.dateTime} • ${s.notes}</div>
-                    </div>
-                    <div>
-                        <button class="btn-sm btn-edit" onclick="openScheduleModal(${i})">Edit</button>
-                        <button class="btn-sm btn-del" onclick="deleteSchedule(${i})">X</button>
-                    </div>
-                </div>`).join('');
-
-            // Render Fees
-            let fList = document.getElementById('fees-list');
-            fList.innerHTML = transactions.length === 0 ? '<div class="list-item"><span class="item-sub">ഫീസ്/ചിലവ് രേഖപ്പെടുത്തിയിട്ടില്ല</span></div>' :
-                transactions.map((t, i) => `
-                <div class="list-item">
-                    <div>
-                        <div style="font-weight:bold;">${t.name}</div>
-                        <div style="font-size:0.75rem; color:#888;">${t.type} • Paid: <b style="color:#00e676">₹${t.amount}</b></div>
-                    </div>
-                    <div>
-                        <button class="btn-sm btn-edit" onclick="openFeeModal(${i})">Edit</button>
-                        <button class="btn-sm btn-del" onclick="deleteFee(${i})">X</button>
-                    </div>
-                </div>`).join('');
-
-            localStorage.setItem('proliv_patients', JSON.stringify(patients));
-            localStorage.setItem('proliv_schedules', JSON.stringify(schedules));
-            localStorage.setItem('proliv_transactions', JSON.stringify(transactions));
-        }
-
-        /* Full Screen List Report (P&L Report Layout) */
-        function showReport(type) {
-            let title = type + " Report";
-            let listData = [];
-
-            if (type === 'Live Patients' || type === 'Total Patients' || type === 'Discharged' || type === 'Rehab') {
-                let filteredP = patients;
-                if (type === 'Live Patients') filteredP = patients.filter(p => p.status === 'Active');
-                else if (type === 'Discharged') filteredP = patients.filter(p => p.status === 'Discharged');
-                else if (type === 'Rehab') filteredP = patients.filter(p => p.status === 'Rehab');
-
-                listData = filteredP.map(p => ({
-                    date: p.startDate || "Oct 27, 2026",
-                    name: p.name,
-                    val: "₹" + p.paid
-                }));
-            } else if (type === 'Total Collection' || type === 'P&L') {
-                listData = transactions.map(t => ({
-                    date: t.date || "Oct 27, 2026",
-                    name: t.name,
-                    val: "₹" + t.amount
-                }));
-            } else if (type === 'Due Amount') {
-                listData = patients.filter(p => p.due > 0).map(p => ({
-                    date: p.startDate || "Oct 27, 2026",
-                    name: p.name,
-                    val: "₹" + p.due
-                }));
-            }
-
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-body').innerHTML = listData.length === 0 ? 
-                '<div style="text-align:center; padding:20px; color:#888;">റെക്കോർഡുകൾ ലഭ്യമല്ല</div>' :
-                listData.map(item => `
-                    <div class="report-row">
-                        <div class="report-date">${item.date}</div>
-                        <div class="report-name">${item.name}</div>
-                        <div class="report-val">${item.val}</div>
-                    </div>
-                `).join('');
-
-            document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        /* Patient Profile View */
-        function viewPatientCard(i) {
-            let p = patients[i];
-            document.getElementById('modal-title').innerText = p.name + " Profile";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="report-row"><span>Location:</span><b>${p.location || 'Calicut'}</b></div>
-                <div class="report-row"><span>Phone:</span><b>${p.phone}</b></div>
-                <div class="report-row"><span>Plan:</span><b>${p.plan}</b></div>
-                <div class="report-row"><span>Final Amount:</span><b>₹${p.finalAmt}</b></div>
-                <div class="report-row"><span>Paid Amount:</span><b style="color:#00e676">₹${p.paid}</b></div>
-                <div class="report-row"><span>Due Amount:</span><b style="color:#ef5350">₹${p.due}</b></div>
-            `;
-            document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        /* Forms */
-        function openPatientModal(index = -1) {
-            currentType = 'patient';
-            editIndex = index;
-            let data = index >= 0 ? patients[index] : { name: '', location: 'Calicut', phone: '', plan: 'Therapy', finalAmt: 350, paid: 330, due: 20 };
-
-            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Patient' : 'Add New Patient';
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Patient Name</label><input id="p_name" value="${data.name}"></div>
-                <div class="form-group"><label>Location</label><input id="p_loc" value="${data.location}"></div>
-                <div class="form-group"><label>Phone Number</label><input id="p_phone" value="${data.phone}"></div>
-                <div class="form-group"><label>Plan / Condition</label><input id="p_plan" value="${data.plan}"></div>
-                <div class="form-group"><label>Final Amount (₹)</label><input type="number" id="p_amt" value="${data.finalAmt}"></div>
-                <div class="form-group"><label>Paid Amount (₹)</label><input type="number" id="p_paid" value="${data.paid}"></div>
-                <div class="form-group"><label>Due Amount (₹)</label><input type="number" id="p_due" value="${data.due}"></div>
-            `;
-            document.getElementById('modal-actions').innerHTML = `
-                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-full btn-save" onclick="saveData()">Save</button>
-            `;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        function openScheduleModal(index = -1) {
-            currentType = 'schedule';
-            editIndex = index;
-            let data = index >= 0 ? schedules[index] : { patientName: patients[0]?.name || '', dateTime: '', notes: '' };
-
-            document.getElementById('modal-title').innerText = 'Schedule Session';
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Patient Name</label><input id="s_name" value="${data.patientName}"></div>
-                <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="s_dt" value="${data.dateTime}"></div>
-                <div class="form-group"><label>Notes</label><input id="s_notes" value="${data.notes}"></div>
-            `;
-            document.getElementById('modal-actions').innerHTML = `
-                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-full btn-save" onclick="saveData()">Save</button>
-            `;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        function openFeeModal(index = -1) {
-            currentType = 'fee';
-            editIndex = index;
-            let data = index >= 0 ? transactions[index] : { name: patients[0]?.name || '', type: 'Income', amount: '', due: 0 };
-
-            document.getElementById('modal-title').innerText = 'Add Fee / Expense';
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Name / Expense Title</label><input id="f_name" value="${data.name}"></div>
-                <div class="form-group"><label>Type</label>
-                    <select id="f_type">
-                        <option value="Income" ${data.type === 'Income' ? 'selected' : ''}>Income</option>
-                        <option value="Expense" ${data.type === 'Expense' ? 'selected' : ''}>Expense</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Amount (₹)</label><input type="number" id="f_amt" value="${data.amount}"></div>
-            `;
-            document.getElementById('modal-actions').innerHTML = `
-                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-full btn-save" onclick="saveData()">Save</button>
-            `;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-        function saveData() {
-            if (currentType === 'patient') {
-                let obj = {
-                    name: document.getElementById('p_name').value,
-                    location: document.getElementById('p_loc').value,
-                    phone: document.getElementById('p_phone').value,
-                    plan: document.getElementById('p_plan').value,
-                    finalAmt: Number(document.getElementById('p_amt').value),
-                    paid: Number(document.getElementById('p_paid').value),
-                    due: Number(document.getElementById('p_due').value),
-                    startDate: "Oct 27, 2026",
-                    endDate: "Nov 27, 2026",
-                    status: "Active"
-                };
-                if (editIndex >= 0) patients[editIndex] = obj; else patients.unshift(obj);
-            } else if (currentType === 'schedule') {
-                let obj = {
-                    patientName: document.getElementById('s_name').value,
-                    dateTime: document.getElementById('s_dt').value,
-                    notes: document.getElementById('s_notes').value
-                };
-                if (editIndex >= 0) schedules[editIndex] = obj; else schedules.unshift(obj);
-            } else if (currentType === 'fee') {
-                let obj = {
-                    name: document.getElementById('f_name').value,
-                    type: document.getElementById('f_type').value,
-                    amount: Number(document.getElementById('f_amt').value),
-                    date: "Oct 29, 2026"
-                };
-                if (editIndex >= 0) transactions[editIndex] = obj; else transactions.unshift(obj);
-            }
-            closeModal();
-            updateDashboard();
-        }
-
-        function deletePatient(i) { if(confirm("Delete patient?")) { patients.splice(i, 1); updateDashboard(); } }
-        function deleteSchedule(i) { schedules.splice(i, 1); updateDashboard(); }
-        function deleteFee(i) { transactions.splice(i, 1); updateDashboard(); }
-
-        updateDashboard();
-    </script>
-</body>
-</html>
+<!-- END PROLIV PHYSIO APP -->
