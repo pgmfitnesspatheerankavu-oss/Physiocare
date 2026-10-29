@@ -246,7 +246,7 @@
     </div>
     <div class="card" onclick="openSection('schedules-box')">
       <div class="card-icon">📅</div>
-      <div class="card-label">Schedules</div>
+      <div class="card-label">Schedules & Visits</div>
       <div class="pill-badge dark" id="navScheduleBadge">0</div>
     </div>
     <div class="card" onclick="openSection('fees-box')">
@@ -260,7 +260,7 @@
   <section id="patients-box" class="section-box">
     <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
     <div class="section-header">
-      <span>PATIENTS LIST (Compact View)</span>
+      <span>PATIENTS LIST (Compact)</span>
     </div>
     <button class="proliv-btn" style="margin-bottom: 10px; padding: 6px 10px;" onclick="openAddPatientModal()">+ Add New Patient</button>
     <div id="patient-list-container"></div>
@@ -270,9 +270,9 @@
   <section id="schedules-box" class="section-box">
     <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
     <div class="section-header">
-      <span>SCHEDULES & REHAB</span>
+      <span>SCHEDULES & DAILY VISITS</span>
     </div>
-    <button class="proliv-btn" style="margin-bottom: 10px; padding: 6px 10px;" onclick="openAddScheduleModal()">+ Add Schedule</button>
+    <button class="proliv-btn" style="margin-bottom: 10px; padding: 6px 10px;" onclick="openAddScheduleModal()">+ Add Visit / Schedule</button>
     <div id="schedules-list"></div>
   </section>
 
@@ -303,7 +303,7 @@
     </div>
   </div>
 
-  <!-- Patient Modal -->
+  <!-- Patient Modal (Compact, no doctor/time fields here) -->
   <div id="patientModal" class="proliv-modal">
     <div class="proliv-modal-content">
       <h3 id="patientModalTitle" style="margin-top:0; font-size:15px;">Patient Details</h3>
@@ -317,16 +317,6 @@
           <div class="proliv-form-group">
             <label>Phone</label>
             <input type="tel" id="pPhone">
-          </div>
-          <div class="proliv-form-group">
-            <label>Doctor Name</label>
-            <input type="text" id="pDoctor" placeholder="Dr. Name">
-          </div>
-        </div>
-        <div class="flex-row">
-          <div class="proliv-form-group">
-            <label>Time Slot</label>
-            <input type="time" id="pTime">
           </div>
           <div class="proliv-form-group">
             <label>Place</label>
@@ -364,47 +354,25 @@
     </div>
   </div>
 
-  <!-- Quick Session / Visit Modal -->
-  <div id="sessionModal" class="proliv-modal">
-    <div class="proliv-modal-content">
-      <h3 style="margin-top:0; font-size:15px;">Add Today's Visit / Time</h3>
-      <form id="sessionForm">
-        <input type="hidden" id="sessPatientId">
-        <div class="proliv-form-group">
-          <label>Patient Name</label>
-          <input type="text" id="sessPatientName" readonly style="background:#111; color:#aaa;">
-        </div>
-        <div class="flex-row">
-          <div class="proliv-form-group">
-            <label>Date *</label>
-            <input type="date" id="sessDate" required>
-          </div>
-          <div class="proliv-form-group">
-            <label>Time *</label>
-            <input type="time" id="sessTime" required>
-          </div>
-        </div>
-        <div class="proliv-form-group">
-          <label>Notes / Session Info</label>
-          <input type="text" id="sessNotes" placeholder="e.g. Day 2 Session">
-        </div>
-        <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn proliv-btn-green" style="flex:1;">Add Visit</button>
-          <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Schedule Modal -->
+  <!-- Schedule / Daily Visit Modal (With Doctor Name & Time) -->
   <div id="scheduleModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 id="scheduleModalTitle" style="margin-top:0; font-size:15px;">Schedule & Rehab</h3>
+      <h3 id="scheduleModalTitle" style="margin-top:0; font-size:15px;">Add Visit / Schedule & Doctor</h3>
       <form id="scheduleForm">
         <input type="hidden" id="sId">
         <div class="proliv-form-group">
           <label>Patient Name *</label>
-          <input type="text" id="sName" required>
+          <input type="text" id="sName" placeholder="Patient Name" required>
+        </div>
+        <div class="flex-row">
+          <div class="proliv-form-group">
+            <label>Doctor Name *</label>
+            <input type="text" id="sDoctor" placeholder="Dr. Name" required>
+          </div>
+          <div class="proliv-form-group">
+            <label>Time Slot *</label>
+            <input type="time" id="sTime" required>
+          </div>
         </div>
         <div class="flex-row">
           <div class="proliv-form-group">
@@ -412,16 +380,12 @@
             <input type="date" id="sDate">
           </div>
           <div class="proliv-form-group">
-            <label>Time</label>
-            <input type="time" id="sTime">
+            <label>Rehab / Session Notes</label>
+            <input type="text" id="sNotes" placeholder="e.g. Day 1 Session">
           </div>
         </div>
-        <div class="proliv-form-group">
-          <label>Rehab Notes</label>
-          <textarea id="sNotes" rows="2"></textarea>
-        </div>
         <div style="display:flex; gap:8px; margin-top:12px;">
-          <button type="submit" class="proliv-btn" style="flex:1;">Save</button>
+          <button type="submit" class="proliv-btn" style="flex:1;">Save Visit</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
         </div>
       </form>
@@ -544,60 +508,26 @@
       id: id ? id : 'p_' + Date.now(),
       name: document.getElementById("pName").value,
       phone: document.getElementById("pPhone").value,
-      doctor: document.getElementById("pDoctor").value,
-      time: document.getElementById("pTime").value,
       place: document.getElementById("pPlace").value,
       fee: parseFloat(document.getElementById("pFee").value) || 0,
       paid: parseFloat(document.getElementById("pPaid").value) || 0,
       status: document.getElementById("pStatus").value,
-      startDate: document.getElementById("pStartDate").value,
-      visits: [] // To store daily visits
+      startDate: document.getElementById("pStartDate").value
     };
+    const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     if (!id) {
       patients.push(patientData);
       if(patientData.paid > 0) {
-        const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         transactions.push({ id: 't_' + Date.now(), title: patientData.name, amount: patientData.paid, date: todayStr, type: 'income' });
       }
     } else {
       const index = patients.findIndex(item => item.id === id);
-      if(index !== -1) {
-        patientData.visits = patients[index].visits || []; // Keep existing visits
-        patients[index] = patientData;
-      }
+      if(index !== -1) patients[index] = patientData;
     }
     saveData();
     closeModals();
   };
-
-  // Quick Session Handler
-  document.getElementById("sessionForm").onsubmit = function(e) {
-    e.preventDefault();
-    const pId = document.getElementById("sessPatientId").value;
-    const dateVal = document.getElementById("sessDate").value;
-    const timeVal = document.getElementById("sessTime").value;
-    const notesVal = document.getElementById("sessNotes").value;
-
-    const p = patients.find(item => item.id === pId);
-    if(p) {
-      if(!p.visits) p.visits = [];
-      p.visits.push({ date: dateVal, time: timeVal, notes: notesVal });
-      saveData();
-      closeModals();
-    }
-  };
-
-  function openSessionModal(id) {
-    const p = patients.find(item => item.id === id);
-    if(!p) return;
-    document.getElementById("sessPatientId").value = p.id;
-    document.getElementById("sessPatientName").value = p.name;
-    document.getElementById("sessDate").value = new Date().toISOString().split('T')[0];
-    document.getElementById("sessTime").value = p.time || "";
-    document.getElementById("sessNotes").value = "";
-    document.getElementById("sessionModal").style.display = "flex";
-  }
 
   document.getElementById("scheduleForm").onsubmit = function(e) {
     e.preventDefault();
@@ -605,8 +535,9 @@
     const scheduleData = {
       id: id ? id : 's_' + Date.now(),
       name: document.getElementById("sName").value,
-      date: document.getElementById("sDate").value,
+      doctor: document.getElementById("sDoctor").value,
       time: document.getElementById("sTime").value,
+      date: document.getElementById("sDate").value || new Date().toISOString().split('T')[0],
       notes: document.getElementById("sNotes").value
     };
     if (!id) schedules.push(scheduleData);
@@ -652,12 +583,10 @@
 
     listEl.innerHTML = filtered.length === 0 ? "<p style='color:#777; text-align:center;'>No patients.</p>" : "";
     filtered.forEach((p) => {
-      let docText = p.doctor ? ` | 🩺 Dr: ${escapeHTML(p.doctor)}` : '';
-      let timeText = p.time ? ` | ⏰ ${escapeHTML(p.time)}` : '';
       listEl.innerHTML += `
         <div class="card-item">
           <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient('${p.id}');">
-            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">${timeText}${docText}</small>
+            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">(📞 ${escapeHTML(p.phone || 'N/A')})</small>
           </div>
           <div>
             <button class="proliv-btn" style="padding:4px 8px; font-size:11px;" onclick="closeModals(); editPatient('${p.id}');">Edit</button>
@@ -673,8 +602,6 @@
     document.getElementById("pId").value = "";
     document.getElementById("pName").value = "";
     document.getElementById("pPhone").value = "";
-    document.getElementById("pDoctor").value = "";
-    document.getElementById("pTime").value = "";
     document.getElementById("pPlace").value = "";
     document.getElementById("pFee").value = "0";
     document.getElementById("pPaid").value = "0";
@@ -690,8 +617,6 @@
     document.getElementById("pId").value = p.id;
     document.getElementById("pName").value = p.name || "";
     document.getElementById("pPhone").value = p.phone || "";
-    document.getElementById("pDoctor").value = p.doctor || "";
-    document.getElementById("pTime").value = p.time || "";
     document.getElementById("pPlace").value = p.place || "";
     document.getElementById("pFee").value = p.fee !== undefined ? p.fee : 0;
     document.getElementById("pPaid").value = p.paid !== undefined ? p.paid : 0;
@@ -708,11 +633,12 @@
   }
 
   function openAddScheduleModal() {
-    document.getElementById("scheduleModalTitle").textContent = "Add Schedule";
+    document.getElementById("scheduleModalTitle").textContent = "Add Visit / Schedule";
     document.getElementById("sId").value = "";
     document.getElementById("sName").value = "";
-    document.getElementById("sDate").value = "";
+    document.getElementById("sDoctor").value = "";
     document.getElementById("sTime").value = "";
+    document.getElementById("sDate").value = new Date().toISOString().split('T')[0];
     document.getElementById("sNotes").value = "";
     document.getElementById("scheduleModal").style.display = "flex";
   }
@@ -720,11 +646,12 @@
   function editSchedule(id) {
     const s = schedules.find(item => item.id === id);
     if(!s) return;
-    document.getElementById("scheduleModalTitle").textContent = "Edit Schedule";
+    document.getElementById("scheduleModalTitle").textContent = "Edit Visit / Schedule";
     document.getElementById("sId").value = s.id;
     document.getElementById("sName").value = s.name || "";
-    document.getElementById("sDate").value = s.date || "";
+    document.getElementById("sDoctor").value = s.doctor || "";
     document.getElementById("sTime").value = s.time || "";
+    document.getElementById("sDate").value = s.date || "";
     document.getElementById("sNotes").value = s.notes || "";
     document.getElementById("scheduleModal").style.display = "flex";
   }
@@ -777,47 +704,38 @@
   }
 
   function renderAllData() {
+    // Super Compact Patient List
     const pContainer = document.getElementById("patient-list-container");
     pContainer.innerHTML = patients.length === 0 ? "<p style='color:#777; font-size:12px;'>No patients added yet.</p>" : "";
     patients.forEach((p) => {
       let paidVal = p.paid !== undefined ? p.paid : 0;
-      let timeStr = p.time ? `⏰ ${escapeHTML(p.time)}` : '';
-      let docStr = p.doctor ? `🩺 ${escapeHTML(p.doctor)}` : '';
-      
-      let visitsHtml = '';
-      if(p.visits && p.visits.length > 0) {
-        visitsHtml = `<br><small style="color:#2196f3;">Visits: ` + p.visits.map(v => `${v.date} (${v.time})`).join(', ') + `</small>`;
-      }
-      
       pContainer.innerHTML += `
         <div class="card-item">
-          <div style="flex:1;">
-            <strong style="cursor:pointer;" onclick="editPatient('${p.id}')">${escapeHTML(p.name)}</strong> 
-            <small style="color:#aaa;">(${escapeHTML(p.status || 'Live')})</small><br>
-            <small style="color:#4caf50;">${timeStr} ${docStr ? '| ' + docStr : ''} | Paid: ₹${paidVal}</small>
-            ${visitsHtml}
+          <div style="flex:1; cursor:pointer;" onclick="editPatient('${p.id}')">
+            <strong>${escapeHTML(p.name)}</strong> <small style="color:#aaa;">(${escapeHTML(p.status || 'Live')})</small> 
+            <span style="color:#4caf50; font-size:11px;">| Paid: ₹${paidVal}</span>
           </div>
-          <div style="display:flex; gap:4px; align-items:center;">
-            <button class="proliv-btn proliv-btn-green" style="padding:4px 6px; font-size:10px;" onclick="openSessionModal('${p.id}')">+ Visit</button>
-            <button class="proliv-btn" style="padding:4px 6px; font-size:10px;" onclick="editPatient('${p.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" style="padding:4px 6px; font-size:10px;" onclick="deletePatient('${p.id}')">Del</button>
+          <div style="display:flex; gap:4px;">
+            <button class="proliv-btn" style="padding:3px 6px; font-size:10px;" onclick="editPatient('${p.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" style="padding:3px 6px; font-size:10px;" onclick="deletePatient('${p.id}')">Del</button>
           </div>
         </div>
       `;
     });
 
+    // Schedules & Daily Visits List (Showing Doctor Name and Time clearly for 50+ Screen view)
     const sContainer = document.getElementById("schedules-list");
-    sContainer.innerHTML = schedules.length === 0 ? "<p style='color:#777; font-size:12px;'>No schedules.</p>" : "";
+    sContainer.innerHTML = schedules.length === 0 ? "<p style='color:#777; font-size:12px;'>No visits or schedules.</p>" : "";
     schedules.forEach((s) => {
       sContainer.innerHTML += `
         <div class="card-item">
           <div style="flex:1; cursor:pointer;" onclick="editSchedule('${s.id}')">
-            <strong>${escapeHTML(s.name)}</strong><br>
-            <small style="color:#aaa;">📅 ${escapeHTML(s.date || '')} ⏰ ${escapeHTML(s.time || '')} - ${escapeHTML(s.notes || '')}</small>
+            <strong>${escapeHTML(s.name)}</strong> <small style="color:#2196f3;">(🩺 Dr. ${escapeHTML(s.doctor || 'N/A')})</small><br>
+            <small style="color:#aaa;">📅 ${escapeHTML(s.date || '')} | ⏰ ${escapeHTML(s.time || '')} ${s.notes ? '| ' + escapeHTML(s.notes) : ''}</small>
           </div>
           <div style="display:flex; gap:4px;">
-            <button class="proliv-btn" style="padding:4px 8px; font-size:11px;" onclick="editSchedule('${s.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" onclick="deleteSchedule('${s.id}')">Del</button>
+            <button class="proliv-btn" style="padding:3px 6px; font-size:10px;" onclick="editSchedule('${s.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" style="padding:3px 6px; font-size:10px;" onclick="deleteSchedule('${s.id}')">Del</button>
           </div>
         </div>
       `;
