@@ -463,7 +463,7 @@
   import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBycFo1QjDvdbDC9vasPCx...", // നിങ്ങളുടെ ഒറിജിനൽ apiKey ഇവിടെ പൂർണ്ണമായി നൽകുക[span_2](start_span)[span_2](end_span)
+    apiKey: "AIzaSyBycFo1QjDvdbDC9vasPCx...", // നിങ്ങളുടെ ഒറിജിനൽ apiKey ഇവിടെ മുഴുവനായി നൽകുക
     authDomain: "pgm-98fde.firebaseapp.com",
     projectId: "pgm-98fde",
     storageBucket: "pgm-98fde.appspot.com",
@@ -537,7 +537,6 @@
           const parsed = JSON.parse(e.target.result);
           if(parsed.patients || parsed.expenses) {
             if(confirm("ഇത് നിലവിലുള്ള ഡാറ്റ പുതിയ ബാക്കപ്പ് ഫയൽ ഉപയോഗിച്ച് റീപ്ലേസ് ചെയ്യും. തുടരണോ?")) {
-              // Clear & upload to Firestore
               for(let p of (parsed.patients || [])) { delete p.id; await addDoc(collection(db, "patients"), p); }
               for(let s of (parsed.schedules || [])) { delete s.id; await addDoc(collection(db, "schedules"), s); }
               for(let ex of (parsed.expenses || [])) { delete ex.id; await addDoc(collection(db, "expenses"), ex); }
@@ -579,7 +578,7 @@
     } else {
       await setDoc(doc(db, "patients", id), patientData);
     }
-    closeModals();
+    window.closeModals();
   };
 
   document.getElementById("scheduleForm").onsubmit = async function(e) {
@@ -596,7 +595,7 @@
     } else {
       await setDoc(doc(db, "schedules", id), scheduleData);
     }
-    closeModals();
+    window.closeModals();
   };
 
   document.getElementById("expenseForm").onsubmit = async function(e) {
@@ -609,7 +608,7 @@
       amount: parseFloat(document.getElementById("eAmount").value) || 0,
       date: formattedDate
     });
-    closeModals();
+    window.closeModals();
   };
 
   document.getElementById("transactionForm").onsubmit = async function(e) {
@@ -623,7 +622,7 @@
       type: 'income',
       date: formattedDate
     });
-    closeModals();
+    window.closeModals();
   };
 
   window.openPatientFilterModal = function(type) {
@@ -648,13 +647,13 @@
       
       listEl.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient('${p.id}');">
+          <div style="flex:1; cursor:pointer;" onclick="window.closeModals(); window.editPatient('${p.id}');">
             <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; ${statusBadgeColor}">(${escapeHTML(p.status || 'Live')})</span><br>
             <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small>
             ${dischargeInfo}
           </div>
           <div>
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="closeModals(); editPatient('${p.id}');">Edit</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.closeModals(); window.editPatient('${p.id}');">Edit</button>
           </div>
         </div>
       `;
@@ -789,14 +788,14 @@
       
       pContainer.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="editPatient('${p.id}')">
+          <div style="flex:1; cursor:pointer;" onclick="window.editPatient('${p.id}')">
             <strong>${escapeHTML(p.name)}</strong> (${escapeHTML(p.status || 'Live')})<br>
             <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small><br>
             <small style="color:#4caf50;">Paid: ₹${paidVal}</small> | <small style="color:${due > 0 ? '#f44336':'#aaa'};">Due: ₹${due}</small>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editPatient('${p.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" onclick="deletePatient('${p.id}')">Del</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.editPatient('${p.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" onclick="window.deletePatient('${p.id}')">Del</button>
           </div>
         </div>
       `;
@@ -807,14 +806,14 @@
     window.schedules.forEach((s) => {
       sContainer.innerHTML += `
         <div class="card-item">
-          <div style="flex:1; cursor:pointer;" onclick="editSchedule('${s.id}')">
+          <div style="flex:1; cursor:pointer;" onclick="window.editSchedule('${s.id}')">
             <strong>${escapeHTML(s.name)}</strong><br>
             <small style="color:#aaa;">📅 ${escapeHTML(s.date || 'No Date')} | ⏰ ${escapeHTML(s.time || 'No Time')}</small>
             <p style="margin:4px 0 0 0; font-size:13px; color:#ddd;">Rehab: ${escapeHTML(s.notes || 'None')}</p>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="editSchedule('${s.id}')">Edit</button>
-            <button class="proliv-btn proliv-btn-danger" onclick="deleteSchedule('${s.id}')">Del</button>
+            <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="window.editSchedule('${s.id}')">Edit</button>
+            <button class="proliv-btn proliv-btn-danger" onclick="window.deleteSchedule('${s.id}')">Del</button>
           </div>
         </div>
       `;
@@ -830,8 +829,8 @@
       </div>
 
       <div class="tab-container">
-        <button id="colTabBtn" class="tab-btn active" onclick="switchPnlTab('collection')">Collection</button>
-        <button id="expTabBtn" class="tab-btn" onclick="switchPnlTab('expense')">Expense</button>
+        <button id="colTabBtn" class="tab-btn active" onclick="window.switchPnlTab('collection')">Collection</button>
+        <button id="expTabBtn" class="tab-btn" onclick="window.switchPnlTab('expense')">Expense</button>
       </div>
 
       <div id="collectionTabContent" class="tab-content active">
@@ -842,7 +841,7 @@
             <span style="font-weight:600;">${escapeHTML(t.title || 'Income')}</span>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="color:var(--accent-green); font-weight:bold;">${t.amount}</span>
-              <button class="proliv-btn proliv-btn-danger" onclick="deleteTransaction('${t.id}')">X</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="window.deleteTransaction('${t.id}')">X</button>
             </div>
           </div>
         `).join('')}
@@ -856,7 +855,7 @@
             <span style="font-weight:600;">${escapeHTML(e.title || 'Expense')}</span>
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="color:var(--accent-red); font-weight:bold;">${e.amount}</span>
-              <button class="proliv-btn proliv-btn-danger" onclick="deleteExpense('${e.id}')">X</button>
+              <button class="proliv-btn proliv-btn-danger" onclick="window.deleteExpense('${e.id}')">X</button>
             </div>
           </div>
         `).join('')}
