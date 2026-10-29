@@ -141,7 +141,171 @@
             margin-bottom: 4px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 8px 10px;
-            background-color: var(--input-
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .btn-save { background-color: var(--accent-primary); color: #000; }
+        .btn-close { background-color: #444; color: #fff; }
+
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .card { padding: 8px 4px; min-height: 80px; }
+            .card-title { font-size: 0.6rem; }
+            .card-value { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PGM PHYSIO DASHBOARD</h1>
+        <div style="font-size: 0.8rem; color: #00e676;">● Live Data</div>
+    </header>
+
+    <!-- 1. Patient Management & Session Tracking -->
+    <div class="section-title">Patient & Treatment Management</div>
+    <div class="dashboard-grid">
+        <div class="card" onclick="openEditModal('Active Patients', 'activePatients', 'Active Session Count')">
+            <span class="card-title">Active Patients</span>
+            <span class="card-value c-blue" id="val-activePatients">8</span>
+        </div>
+        <div class="card" onclick="openEditModal('Total Registered', 'totalPatients', 'Total Patients Count')">
+            <span class="card-title">Total Patients</span>
+            <span class="card-value" id="val-totalPatients">64</span>
+        </div>
+        <div class="card" onclick="openEditModal('Completed Sessions', 'completedSessions', 'Sessions Finished')">
+            <span class="card-title">Completed</span>
+            <span class="card-value c-green" id="val-completedSessions">42</span>
+        </div>
+    </div>
+
+    <!-- 2. Appointment & Rehab Tracking -->
+    <div class="section-title">Appointments & Rehab</div>
+    <div class="dashboard-grid">
+        <div class="card" onclick="openEditModal('Early Rehab Patients', 'rehabCount', 'Patients in 1-3 Days Rehab')">
+            <span class="card-title">Rehab (1-3 Days)</span>
+            <span class="card-value c-orange" id="val-rehabCount">2</span>
+        </div>
+        <div class="card" onclick="openEditModal('Follow-up Due', 'followUpCount', 'Pending Follow-ups')">
+            <span class="card-title">Follow-up Due</span>
+            <span class="card-value c-orange" id="val-followUpCount">5</span>
+        </div>
+        <div class="card" onclick="openEditModal('Discharged Patients', 'dischargedCount', 'Successfully Recovered')">
+            <span class="card-title">Discharged</span>
+            <span class="card-value" id="val-dischargedCount">14</span>
+        </div>
+    </div>
+
+    <!-- 3. Fees & Accounts -->
+    <div class="section-title">Fees & Accounts</div>
+    <div class="dashboard-grid">
+        <div class="card" onclick="openEditModal('Today Collection', 'todayCollection', 'Amount Collected Today (₹)')">
+            <span class="card-title">Today Collection</span>
+            <span class="card-value c-green" id="val-todayCollection">₹1.5K</span>
+        </div>
+        <div class="card" onclick="openEditModal('Weekly Collection', 'weeklyCollection', '7 Days Revenue (₹)')">
+            <span class="card-title">Weekly Collection</span>
+            <span class="card-value c-blue" id="val-weeklyCollection">₹12.4K</span>
+        </div>
+        <div class="card" onclick="openEditModal('Monthly Collection', 'monthlyCollection', 'Monthly Revenue (₹)')">
+            <span class="card-title">Monthly Collection</span>
+            <span class="card-value c-green" id="val-monthlyCollection">₹48K</span>
+        </div>
+        <div class="card" onclick="openEditModal('Yearly Collection', 'yearlyCollection', '2026 Collection (₹)')">
+            <span class="card-title">Collection (2026)</span>
+            <span class="card-value c-blue" id="val-yearlyCollection">₹3.2L</span>
+        </div>
+        <div class="card" onclick="openEditModal('Pending Due Amount', 'dueAmount', 'Total Balance Dues (₹)')">
+            <span class="card-title">Due Amount</span>
+            <span class="card-value c-red" id="val-dueAmount">₹2.0K</span>
+        </div>
+        <div class="card" onclick="openEditModal('Total Expense', 'totalExpense', 'Clinic Expense (₹)')">
+            <span class="card-title">Total Expense</span>
+            <span class="card-value c-red" id="val-totalExpense">₹14.5K</span>
+        </div>
+    </div>
+
+    <!-- Edit Details Modal Popup -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Edit Item</div>
+            <div class="form-group">
+                <label id="modalFieldLabel">Value</label>
+                <input type="text" id="modalInput" placeholder="Enter new value">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-close" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveData()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentKey = '';
+
+        function openEditModal(title, key, label) {
+            currentKey = key;
+            document.getElementById('modalTitle').innerText = "Edit: " + title;
+            document.getElementById('modalFieldLabel').innerText = label;
+            
+            let currentValue = document.getElementById('val-' + key).innerText;
+            document.getElementById('modalInput').value = currentValue;
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveData() {
+            let newValue = document.getElementById('modalInput').value.trim();
+            if (newValue !== "") {
+                document.getElementById('val-' + currentKey).innerText = newValue;
+                localStorage.setItem('physio_' + currentKey, newValue);
+            }
+            closeModal();
+        }
+
+        window.onload = function() {
+            const keys = [
+                'activePatients', 'totalPatients', 'completedSessions', 
+                'rehabCount', 'followUpCount', 'dischargedCount',
+                'todayCollection', 'weeklyCollection', 'monthlyCollection', 
+                'yearlyCollection', 'dueAmount', 'totalExpense'
+            ];
+
+            keys.forEach(key => {
+                let savedVal = localStorage.getItem('physio_' + key);
+                if (savedVal) {
+                    let element = document.getElementById('val-' + key);
+                    if (element) element.innerText = savedVal;
+                }
+            });
+        };
+    </script>
+</body>
+</html>
