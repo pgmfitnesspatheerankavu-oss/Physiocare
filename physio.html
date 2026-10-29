@@ -72,7 +72,9 @@
       border-radius: 12px;
       padding: 12px;
       text-align: center;
+      cursor: pointer;
     }
+    .stat-card:active { transform: scale(0.97); }
     .stat-card small { color: var(--text-muted); font-size: 11px; }
     .stat-card div:last-child { font-size: 16px; font-weight: bold; margin-top: 4px; }
 
@@ -107,6 +109,49 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
+    }
+
+    /* P&L Report Tabs & Styles */
+    .pnl-summary-box {
+      background: #252528;
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+      border: 1px solid #444;
+    }
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid #444;
+      margin-bottom: 15px;
+    }
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      color: #fff;
+      border-bottom: 3px solid var(--accent-red);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .pnl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222225;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      border: 1px solid #333;
     }
 
     /* Modals & Forms */
@@ -161,7 +206,7 @@
     }
     .proliv-btn-secondary { background: #444; }
     .proliv-btn-green { background: #2e7d32; }
-    .proliv-btn-danger { background: #c62828; padding: 6px 10px; font-size: 12px; }
+    .proliv-btn-danger { background: #c62828; padding: 4px 8px; font-size: 11px; }
     
     .card-item {
       background: #252528;
@@ -186,14 +231,14 @@
     <h2 style="margin: 0; font-size: 20px;">PROLIV PHYSIO</h2>
   </div>
 
-  <!-- Dashboard Overview Stats -->
+  <!-- Dashboard Overview Stats (Clickable) -->
   <div class="stats-grid">
-    <div class="stat-card"><small>Live Patients</small><div id="statLive">0</div></div>
-    <div class="stat-card"><small>Total Patients</small><div id="statTotal">0</div></div>
-    <div class="stat-card"><small>Discharged</small><div id="statDischarged">0</div></div>
-    <div class="stat-card"><small>Schedules</small><div id="statSchedules">0</div></div>
-    <div class="stat-card"><small>Collection</small><div id="statCollection" style="color:var(--accent-green);">₹0</div></div>
-    <div class="stat-card"><small>Net Profit</small><div id="statProfit">₹0</div></div>
+    <div class="stat-card" onclick="openPatientFilterModal('Live')"><small>Live Patients</small><div id="statLive">0</div></div>
+    <div class="stat-card" onclick="openPatientFilterModal('All')"><small>Total Patients</small><div id="statTotal">0</div></div>
+    <div class="stat-card" onclick="openPatientFilterModal('Discharged')"><small>Discharged</small><div id="statDischarged">0</div></div>
+    <div class="stat-card" onclick="openSection('schedules-box')"><small>Schedules</small><div id="statSchedules">0</div></div>
+    <div class="stat-card" onclick="openSection('fees-box')"><small>Collection</small><div id="statCollection" style="color:var(--accent-green);">₹0</div></div>
+    <div class="stat-card" onclick="openSection('fees-box')"><small>Net Profit</small><div id="statProfit">₹0</div></div>
   </div>
 
   <!-- Main Navigation Grid Cards -->
@@ -239,7 +284,7 @@
   <section id="fees-box" class="section-box">
     <button type="button" class="section-home-btn" onclick="goHome()">← Home</button>
     <div class="section-header" id="fees-sec">
-      <span>FEES & ACCOUNTS (P&L)</span>
+      <span>P&L Report</span>
     </div>
     <div style="display:flex; gap:10px; margin-bottom:14px;">
       <button class="proliv-btn proliv-btn-green" style="flex:1;" onclick="openAddTransactionModal()">+ Add Income</button>
@@ -251,6 +296,17 @@
 
 <!-- Modals Container -->
 <div id="proliv-dynamic-modals">
+  <!-- Patient Filter Modal (For Live/Total/Discharged Names) -->
+  <div id="patientFilterModal" class="proliv-modal">
+    <div class="proliv-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 id="filterModalTitle" style="margin:0;">Patient List</h3>
+        <button class="proliv-btn proliv-btn-secondary" style="padding:4px 10px;" onclick="closeModals()">✕</button>
+      </div>
+      <div id="filteredPatientList"></div>
+    </div>
+  </div>
+
   <!-- Patient Modal -->
   <div id="patientModal" class="proliv-modal">
     <div class="proliv-modal-content">
@@ -277,7 +333,7 @@
             <input type="text" id="pPlan">
           </div>
           <div class="proliv-form-group">
-            <label>Total Fee / Final Amt (₹)</label>
+            <label>Total Fee (₹)</label>
             <input type="number" id="pFee" value="0">
           </div>
         </div>
@@ -357,6 +413,10 @@
           <label>Amount (₹) *</label>
           <input type="number" id="eAmount" required>
         </div>
+        <div class="proliv-form-group">
+          <label>Date</label>
+          <input type="date" id="eDate">
+        </div>
         <div style="display:flex; gap:10px; margin-top:15px;">
           <button type="submit" class="proliv-btn" style="flex:1;">Add Expense</button>
           <button type="button" class="proliv-btn proliv-btn-secondary" onclick="closeModals()" style="flex:1;">Cancel</button>
@@ -368,15 +428,19 @@
   <!-- Income/Transaction Modal -->
   <div id="transactionModal" class="proliv-modal">
     <div class="proliv-modal-content">
-      <h3 style="margin-top:0;">Add Other Income</h3>
+      <h3 style="margin-top:0;">Add Income</h3>
       <form id="transactionForm">
         <div class="proliv-form-group">
-          <label>Source / Description *</label>
+          <label>Source / Patient Name *</label>
           <input type="text" id="tTitle" required>
         </div>
         <div class="proliv-form-group">
           <label>Amount (₹) *</label>
           <input type="number" id="tAmount" required>
+        </div>
+        <div class="proliv-form-group">
+          <label>Date</label>
+          <input type="date" id="tDate">
         </div>
         <div style="display:flex; gap:10px; margin-top:15px;">
           <button type="submit" class="proliv-btn proliv-btn-green" style="flex:1;">Add Income</button>
@@ -447,12 +511,16 @@
       const newStatus = document.getElementById("pStatus").value;
       const newStart = document.getElementById("pStartDate").value;
       const newEnd = document.getElementById("pEndDate").value;
+      const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
       if (idx === "") {
         window.patients.push({
           name: newName, phone: newPhone, place: newPlace, plan: newPlan,
           fee: newFee, paid: newPaid, status: newStatus, startDate: newStart, endDate: newEnd
         });
+        if(newPaid > 0) {
+          window.transactions.push({ title: newName, amount: newPaid, date: todayStr, type: 'income' });
+        }
       } else {
         window.patients[idx] = {
           ...window.patients[idx],
@@ -479,24 +547,60 @@
 
     document.getElementById("expenseForm").onsubmit = function(e) {
       e.preventDefault();
+      const dateVal = document.getElementById("eDate").value;
+      const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      
       window.expenses.push({
         title: document.getElementById("eTitle").value,
         amount: parseFloat(document.getElementById("eAmount").value) || 0,
-        date: new Date().toLocaleDateString()
+        date: formattedDate
       });
       saveData(); closeModals(); renderAllData();
     };
 
     document.getElementById("transactionForm").onsubmit = function(e) {
       e.preventDefault();
+      const dateVal = document.getElementById("tDate").value;
+      const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
       window.transactions.push({
         title: document.getElementById("tTitle").value,
         amount: parseFloat(document.getElementById("tAmount").value) || 0,
         type: 'income',
-        isStandalone: true, // Marker to distinguish from patient paid fee
-        date: new Date().toLocaleDateString()
+        date: formattedDate
       });
       saveData(); closeModals(); renderAllData();
+    };
+
+    // Filter Popup for Patient Counts
+    window.openPatientFilterModal = function(type) {
+      const titleEl = document.getElementById("filterModalTitle");
+      const listEl = document.getElementById("filteredPatientList");
+      
+      let filtered = window.patients;
+      if(type === 'Live') {
+        titleEl.textContent = "Live Patients List";
+        filtered = window.patients.filter(p => (p.status || 'Live') === 'Live');
+      } else if(type === 'Discharged') {
+        titleEl.textContent = "Discharged Patients List";
+        filtered = window.patients.filter(p => p.status === 'Discharged');
+      } else {
+        titleEl.textContent = "Total Patients List";
+      }
+
+      listEl.innerHTML = filtered.length === 0 ? "<p style='color:#777; text-align:center;'>No patients found.</p>" : "";
+      filtered.forEach((p) => {
+        listEl.innerHTML += `
+          <div class="card-item">
+            <div>
+              <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; color:var(--text-muted);">(${escapeHTML(p.status || 'Live')})</span><br>
+              <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById("patientFilterModal").style.display = "flex";
     };
 
     // Modals Triggers
@@ -569,12 +673,14 @@
     window.openAddExpenseModal = function() {
       document.getElementById("eTitle").value = "";
       document.getElementById("eAmount").value = "";
+      document.getElementById("eDate").value = new Date().toISOString().split('T')[0];
       document.getElementById("expenseModal").style.display = "flex";
     };
 
     window.openAddTransactionModal = function() {
       document.getElementById("tTitle").value = "";
       document.getElementById("tAmount").value = "";
+      document.getElementById("tDate").value = new Date().toISOString().split('T')[0];
       document.getElementById("transactionModal").style.display = "flex";
     };
 
@@ -593,32 +699,27 @@
       document.getElementById("scheduleModal").style.display = "none";
       document.getElementById("expenseModal").style.display = "none";
       document.getElementById("transactionModal").style.display = "none";
+      document.getElementById("patientFilterModal").style.display = "none";
     };
 
-    // Calculation Helper to avoid Double-Counting
-    function getFinancials() {
-      let patientCollection = window.patients.reduce((sum, p) => sum + (p.paid !== undefined ? p.paid : (p.paidAmount || 0)), 0);
+    window.switchPnlTab = function(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
-      // Calculate standalone income from transactions to prevent double counting with patient.paid
-      let standaloneIncome = window.transactions.reduce((sum, t) => {
-        if (t.isStandalone || (t.type === 'income' && !t.patientId)) {
-          return sum + (t.amount || 0);
-        }
-        return sum;
-      }, 0);
+      if(tabName === 'collection') {
+        document.getElementById('colTabBtn').classList.add('active');
+        document.getElementById('collectionTabContent').classList.add('active');
+      } else {
+        document.getElementById('expTabBtn').classList.add('active');
+        document.getElementById('expenseTabContent').classList.add('active');
+      }
+    };
 
-      let totalCollection = patientCollection + standaloneIncome;
-
-      let totalDue = window.patients.reduce((sum, p) => {
-        let f = p.fee !== undefined ? p.fee : (p.finalAmt || 0);
-        let pd = p.paid !== undefined ? p.paid : (p.paidAmount || 0);
-        return sum + Math.max(0, f - pd);
-      }, 0);
-
+    function getFinancials() {
+      let totalCollection = window.transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
       let totalExpense = window.expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
       let netProfit = totalCollection - totalExpense;
-
-      return { patientCollection, standaloneIncome, totalCollection, totalDue, totalExpense, netProfit };
+      return { totalCollection, totalExpense, netProfit };
     }
 
     function renderAllData() {
@@ -664,38 +765,50 @@
         `;
       });
 
-      // Render Fees & P&L
+      // Render Fees & P&L (Image Style)
       const fContainer = document.getElementById("fees-list");
       const fin = getFinancials();
 
       fContainer.innerHTML = `
-        <div style="background:#252528; padding:14px; border-radius:12px; margin-bottom:14px; border:1px solid #444;">
-          <p style="margin:4px 0;"><strong>Patient Payments:</strong> ₹${fin.patientCollection}</p>
-          <p style="margin:4px 0;"><strong>Other Income:</strong> ₹${fin.standaloneIncome}</p>
-          <p style="margin:4px 0; color:#4caf50;"><strong>Total Collection:</strong> ₹${fin.totalCollection}</p>
-          <p style="margin:4px 0; color:#f44336;"><strong>Total Due Amount:</strong> ₹${fin.totalDue}</p>
-          <p style="margin:4px 0; color:#e0e0e0;"><strong>Total Expenses:</strong> ₹${fin.totalExpense}</p>
-          <hr style="border:0; border-top:1px solid #444; margin:8px 0;">
-          <p style="margin:4px 0; font-size:16px; color: ${fin.netProfit >= 0 ? '#4caf50' : '#f44336'};"><strong>Net Profit:</strong> ₹${fin.netProfit}</p>
+        <div class="pnl-summary-box">
+          <div style="font-size: 15px; margin-bottom: 6px;">Net Profit: <b>₹${fin.netProfit}</b> Total</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Collection : <span style="color:var(--accent-green);">${fin.totalCollection}</span> &nbsp; Expense : <span style="color:var(--accent-red);">${fin.totalExpense}</span></div>
         </div>
-        
-        <h4 style="margin:10px 0;">Other Income History</h4>
-        ${window.transactions.length === 0 ? "<p style='color:#777;'>No other income recorded.</p>" : ""}
-        ${window.transactions.map((t, idx) => `
-          <div style="background:#252528; padding:8px 12px; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:13px;">
-            <div>${escapeHTML(t.title || 'Income')} : <b style="color:#4caf50;">+₹${t.amount}</b> <small style="color:#aaa;">(${escapeHTML(t.date || '')})</small></div>
-            <button class="proliv-btn proliv-btn-danger" style="padding:4px 8px;" onclick="deleteTransaction(${idx})">X</button>
-          </div>
-        `).join('')}
 
-        <h4 style="margin:14px 0 10px 0;">Expense History</h4>
-        ${window.expenses.length === 0 ? "<p style='color:#777;'>No expenses recorded.</p>" : ""}
-        ${window.expenses.map((e, idx) => `
-          <div style="background:#252528; padding:8px 12px; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:13px;">
-            <div>${escapeHTML(e.title)} : <b style="color:#f44336;">-₹${e.amount}</b> <small style="color:#aaa;">(${escapeHTML(e.date)})</small></div>
-            <button class="proliv-btn proliv-btn-danger" style="padding:4px 8px;" onclick="deleteExpense(${idx})">X</button>
-          </div>
-        `).join('')}
+        <div class="tab-container">
+          <button id="colTabBtn" class="tab-btn active" onclick="switchPnlTab('collection')">Collection</button>
+          <button id="expTabBtn" class="tab-btn" onclick="switchPnlTab('expense')">Expense</button>
+        </div>
+
+        <!-- Collection Tab Content -->
+        <div id="collectionTabContent" class="tab-content active">
+          ${window.transactions.length === 0 ? "<p style='color:#777; text-align:center;'>No collection records.</p>" : ""}
+          ${window.transactions.map((t, idx) => `
+            <div class="pnl-row">
+              <span style="color:var(--text-muted); font-size:13px;">${escapeHTML(t.date || 'N/A')}</span>
+              <span style="font-weight:600;">${escapeHTML(t.title || 'Income')}</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="color:var(--accent-green); font-weight:bold;">${t.amount}</span>
+                <button class="proliv-btn proliv-btn-danger" onclick="deleteTransaction(${idx})">X</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Expense Tab Content -->
+        <div id="expenseTabContent" class="tab-content">
+          ${window.expenses.length === 0 ? "<p style='color:#777; text-align:center;'>No expense records.</p>" : ""}
+          ${window.expenses.map((e, idx) => `
+            <div class="pnl-row">
+              <span style="color:var(--text-muted); font-size:13px;">${escapeHTML(e.date || 'N/A')}</span>
+              <span style="font-weight:600;">${escapeHTML(e.title || 'Expense')}</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="color:var(--accent-red); font-weight:bold;">${e.amount}</span>
+                <button class="proliv-btn proliv-btn-danger" onclick="deleteExpense(${idx})">X</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       `;
 
       updateDashboardStats();
@@ -706,7 +819,6 @@
       const totalCount = window.patients.length;
       const dischargedCount = window.patients.filter(p => p.status === "Discharged").length;
       const schedCount = window.schedules.length;
-      
       const fin = getFinancials();
 
       document.getElementById("statLive").textContent = liveCount;
