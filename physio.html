@@ -155,3 +155,500 @@
         }
 
         .list-item {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #2a2a2c;
+            cursor: pointer;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .item-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .item-sub {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-edit { background: #3a3a3c; color: #fff; }
+        .btn-del { background: #5f1414; color: #ff8a80; }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--red-accent);
+            color: #ffffff;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(213, 47, 47, 0.5);
+            cursor: pointer;
+            border: none;
+            z-index: 99;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            border-top: 1px solid #3a3a3c;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2e;
+            border: 1px solid #3a3a3c;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .btn-full {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-save { background: var(--red-accent); color: #fff; }
+        .btn-cancel { background: #3a3a3c; color: #fff; }
+
+        /* Detail Modal Styling */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #2c2c2e;
+            font-size: 0.85rem;
+        }
+        .detail-label { color: var(--text-sub); }
+        .detail-val { font-weight: bold; color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <div class="top-bar">
+        <div class="brand">
+            <div class="brand-logo">P</div>
+            <div class="brand-title">PROLIV PHYSIO</div>
+        </div>
+        <div class="top-icons">
+            <button class="top-icon-btn" onclick="openPatientModal()">👤+</button>
+            <button class="top-icon-btn" onclick="openPnlModal()">📈</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="grid">
+        <!-- Row 1 -->
+        <div class="card" onclick="showCardDetails('Live Patients')">
+            <div class="card-icon">👥</div>
+            <div class="card-label">Live Patients</div>
+            <div class="pill-badge" id="val-activePatients">0</div>
+        </div>
+        <div class="card" onclick="showCardDetails('Total Patients')">
+            <div class="card-icon">🔍</div>
+            <div class="card-label">Total Patients</div>
+            <div class="pill-badge dark" id="val-totalPatients">0</div>
+        </div>
+        <div class="card" onclick="showCardDetails('Discharged')">
+            <div class="card-icon">👤❌</div>
+            <div class="card-label">Discharged</div>
+            <div class="pill-badge dark" id="val-dischargedCount">0</div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="card" onclick="showCardDetails('Rehab')">
+            <div class="card-icon">🕒</div>
+            <div class="card-label">Rehab (1-3 Days)</div>
+            <div class="pill-badge" id="val-rehabCount">0</div>
+        </div>
+        <div class="card" onclick="showCardDetails('Follow-up Due')">
+            <div class="card-icon">⏰</div>
+            <div class="card-label">Follow-up Due</div>
+            <div class="pill-badge" id="val-followUpCount">0</div>
+        </div>
+        <div class="card" onclick="showCardDetails('Scheduled')">
+            <div class="card-icon">📅</div>
+            <div class="card-label">Scheduled</div>
+            <div class="pill-badge dark" id="val-scheduledCount">0</div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="card" onclick="openPnlModal()">
+            <div class="card-icon">💰</div>
+            <div class="card-label">Total Collection</div>
+            <div class="pill-badge dark" id="val-totalCollection">₹0</div>
+        </div>
+        <div class="card" onclick="showCardDetails('Due Amount')">
+            <div class="card-icon">👛</div>
+            <div class="card-label">Due Amount</div>
+            <div class="pill-badge" id="val-dueAmount">₹0</div>
+        </div>
+        <div class="card" onclick="openPnlModal()">
+            <div class="card-icon">💸</div>
+            <div class="card-label">Total Expense</div>
+            <div class="pill-badge" id="val-totalExpense">₹0</div>
+        </div>
+    </div>
+
+    <!-- Patients List -->
+    <div class="section-header" id="patients-sec">
+        <span>Patients List</span>
+        <button class="btn-sm btn-edit" onclick="openPatientModal()">+ Patient</button>
+    </div>
+    <div class="data-list" id="patients-list"></div>
+
+    <!-- Schedules List -->
+    <div class="section-header" id="schedules-sec">
+        <span>Schedules & Rehab</span>
+        <button class="btn-sm btn-edit" onclick="openScheduleModal()">+ Schedule</button>
+    </div>
+    <div class="data-list" id="schedules-list"></div>
+
+    <!-- Fees & Accounts -->
+    <div class="section-header" id="fees-sec">
+        <span>Fees & Accounts (P&L)</span>
+        <button class="btn-sm btn-edit" onclick="openFeeModal()">+ Entry</button>
+    </div>
+    <div class="data-list" id="fees-list"></div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="openPatientModal()">+</button>
+
+    <!-- Modal Popup Form -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">Edit Details</div>
+            <div id="modal-body"></div>
+            <div class="modal-actions" id="modal-actions">
+                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-full btn-save" onclick="saveData()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let patients = JSON.parse(localStorage.getItem('proliv_patients')) || [
+            { name: "Sudheesh", condition: "L5 Spine Therapy", status: "Rehab" }
+        ];
+        let schedules = JSON.parse(localStorage.getItem('proliv_schedules')) || [];
+        let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [
+            { name: "Sudheesh", type: "Income", amount: 330, due: 0, date: "Oct 28, 2026" }
+        ];
+
+        let currentType = '';
+        let editIndex = -1;
+
+        function updateDashboard() {
+            let activePatients = patients.filter(p => p.status === 'Active').length;
+            let discharged = patients.filter(p => p.status === 'Discharged').length;
+            let rehab = patients.filter(p => p.status === 'Rehab').length;
+            let followUp = schedules.filter(s => s.status === 'Follow-up').length;
+            
+            let totalIncome = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.amount), 0);
+            let totalExpense = transactions.filter(t => t.type === 'Expense').reduce((a, b) => a + Number(b.amount), 0);
+            let totalDue = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.due || 0), 0);
+
+            document.getElementById('val-activePatients').innerText = activePatients;
+            document.getElementById('val-totalPatients').innerText = patients.length;
+            document.getElementById('val-dischargedCount').innerText = discharged;
+            document.getElementById('val-rehabCount').innerText = rehab;
+            document.getElementById('val-followUpCount').innerText = followUp;
+            document.getElementById('val-scheduledCount').innerText = schedules.length;
+
+            document.getElementById('val-totalCollection').innerText = '₹' + totalIncome;
+            document.getElementById('val-dueAmount').innerText = '₹' + totalDue;
+            document.getElementById('val-totalExpense').innerText = '₹' + totalExpense;
+
+            // Render Patients
+            let pList = document.getElementById('patients-list');
+            pList.innerHTML = patients.length === 0 ? '<div class="list-item"><span class="item-sub">രോഗികളുടെ വിവരങ്ങൾ ചേർത്തിട്ടില്ല</span></div>' :
+                patients.map((p, i) => `
+                <div class="list-item" onclick="viewPatientDetails(${i})">
+                    <div class="item-info">
+                        <span class="item-title">${p.name}</span>
+                        <span class="item-sub">${p.condition} • <b style="color:${p.status === 'Active' ? '#00e676' : '#ff9800'}">${p.status}</b></span>
+                    </div>
+                    <div class="item-actions" onclick="event.stopPropagation()">
+                        <button class="btn-sm btn-edit" onclick="openPatientModal(${i})">Edit</button>
+                        <button class="btn-sm btn-del" onclick="deletePatient(${i})">X</button>
+                    </div>
+                </div>`).join('');
+
+            // Render Schedules
+            let sList = document.getElementById('schedules-list');
+            sList.innerHTML = schedules.length === 0 ? '<div class="list-item"><span class="item-sub">ഷെഡ്യൂളുകൾ ഒന്നും നിലവിലില്ല</span></div>' :
+                schedules.map((s, i) => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <span class="item-title">${s.patientName}</span>
+                        <span class="item-sub">${s.dateTime} • ${s.notes}</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-sm btn-edit" onclick="openScheduleModal(${i})">Edit</button>
+                        <button class="btn-sm btn-del" onclick="deleteSchedule(${i})">X</button>
+                    </div>
+                </div>`).join('');
+
+            // Render Fees
+            let fList = document.getElementById('fees-list');
+            fList.innerHTML = transactions.length === 0 ? '<div class="list-item"><span class="item-sub">ഫീസ്/ചിലവ് രേഖപ്പെടുത്തിയിട്ടില്ല</span></div>' :
+                transactions.map((t, i) => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <span class="item-title">${t.name}</span>
+                        <span class="item-sub">${t.type} • Paid: <b style="color:#00e676">₹${t.amount}</b> | Due: <b style="color:#ef5350">₹${t.due || 0}</b></span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-sm btn-edit" onclick="openFeeModal(${i})">Edit</button>
+                        <button class="btn-sm btn-del" onclick="deleteFee(${i})">X</button>
+                    </div>
+                </div>`).join('');
+
+            localStorage.setItem('proliv_patients', JSON.stringify(patients));
+            localStorage.setItem('proliv_schedules', JSON.stringify(schedules));
+            localStorage.setItem('proliv_transactions', JSON.stringify(transactions));
+        }
+
+        /* View Patient Full Profile Popup */
+        function viewPatientDetails(index) {
+            let p = patients[index];
+            let pSchedules = schedules.filter(s => s.patientName === p.name);
+            let pTx = transactions.filter(t => t.name === p.name);
+            let totalPaid = pTx.reduce((a, b) => a + Number(b.amount), 0);
+            let totalDue = pTx.reduce((a, b) => a + Number(b.due || 0), 0);
+
+            document.getElementById('modal-title').innerText = "Patient Details: " + p.name;
+            document.getElementById('modal-body').innerHTML = `
+                <div class="detail-row"><span class="detail-label">Name:</span><span class="detail-val">${p.name}</span></div>
+                <div class="detail-row"><span class="detail-label">Condition:</span><span class="detail-val">${p.condition}</span></div>
+                <div class="detail-row"><span class="detail-label">Status:</span><span class="detail-val" style="color:#00e676">${p.status}</span></div>
+                <div class="detail-row"><span class="detail-label">Total Fee Paid:</span><span class="detail-val" style="color:#00e676">₹${totalPaid}</span></div>
+                <div class="detail-row"><span class="detail-label">Pending Due:</span><span class="detail-val" style="color:#ef5350">₹${totalDue}</span></div>
+                <div style="margin-top:12px; font-weight:bold; font-size:0.8rem; color:var(--text-sub);">SCHEDULED SESSIONS:</div>
+                ${pSchedules.length === 0 ? '<div style="font-size:0.75rem; color:#666; margin-top:4px;">No upcoming sessions</div>' : 
+                  pSchedules.map(s => `<div class="detail-row"><span>${s.dateTime}</span><span>${s.notes}</span></div>`).join('')}
+            `;
+            document.getElementById('modal-actions').innerHTML = `
+                <button class="btn-full btn-cancel" onclick="closeModal()">Close</button>
+                <button class="btn-full btn-save" onclick="openPatientModal(${index})">Edit Profile</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        /* View P&L Report Modal */
+        function openPnlModal() {
+            let incomeTx = transactions.filter(t => t.type === 'Income');
+            let expenseTx = transactions.filter(t => t.type === 'Expense');
+            let totalInc = incomeTx.reduce((a, b) => a + Number(b.amount), 0);
+            let totalExp = expenseTx.reduce((a, b) => a + Number(b.amount), 0);
+            let net = totalInc - totalExp;
+
+            document.getElementById('modal-title').innerText = "P&L Report & Transactions";
+            document.getElementById('modal-body').innerHTML = `
+                <div style="text-align:center; padding:10px; background:#2c2c2e; border-radius:10px; margin-bottom:12px;">
+                    <div style="font-size:0.8rem; color:#aaa;">Net Profit</div>
+                    <div style="font-size:1.4rem; font-weight:bold; color:${net >= 0 ? '#00e676' : '#ef5350'};">₹${net}</div>
+                    <div style="font-size:0.75rem; color:#888; margin-top:4px;">Collection: ₹${totalInc} | Expense: ₹${totalExp}</div>
+                </div>
+                <div style="font-weight:bold; font-size:0.8rem; margin-bottom:6px; color:var(--text-sub);">INCOME / COLLECTION LOG</div>
+                ${incomeTx.map(t => `<div class="detail-row"><span>${t.name}</span><span style="color:#00e676">₹${t.amount}</span></div>`).join('')}
+            `;
+            document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        /* Card Details View */
+        function showCardDetails(category) {
+            let filtered = [];
+            if(category === 'Live Patients') filtered = patients.filter(p => p.status === 'Active');
+            else if(category === 'Total Patients') filtered = patients;
+            else if(category === 'Discharged') filtered = patients.filter(p => p.status === 'Discharged');
+            else if(category === 'Rehab') filtered = patients.filter(p => p.status === 'Rehab');
+
+            document.getElementById('modal-title').innerText = category + " Overview";
+            document.getElementById('modal-body').innerHTML = filtered.length === 0 ? 
+                '<div style="color:#888; padding:10px 0;">റെക്കോർഡുകൾ ലഭ്യമല്ല</div>' :
+                filtered.map(p => `<div class="detail-row"><span>${p.name}</span><span style="color:#00e676">${p.condition}</span></div>`).join('');
+            
+            document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        /* Modal Forms */
+        function openPatientModal(index = -1) {
+            currentType = 'patient';
+            editIndex = index;
+            let data = index >= 0 ? patients[index] : { name: '', condition: '', status: 'Active' };
+
+            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Patient' : 'Add New Patient';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="form-group"><label>Patient Name</label><input id="p_name" value="${data.name}"></div>
+                <div class="form-group"><label>Condition / Treatment</label><input id="p_cond" value="${data.condition}"></div>
+                <div class="form-group"><label>Status</label>
+                    <select id="p_stat">
+                        <option value="Active" ${data.status === 'Active' ? 'selected' : ''}>Active</option>
+                        <option value="Rehab" ${data.status === 'Rehab' ? 'selected' : ''}>Rehab (1-3 Days)</option>
+                        <option value="Discharged" ${data.status === 'Discharged' ? 'selected' : ''}>Discharged</option>
+                    </select>
+                </div>`;
+            document.getElementById('modal-actions').innerHTML = `
+                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-full btn-save" onclick="saveData()">Save</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function openScheduleModal(index = -1) {
+            currentType = 'schedule';
+            editIndex = index;
+            let data = index >= 0 ? schedules[index] : { patientName: patients[0]?.name || '', dateTime: '', notes: '', status: 'Scheduled' };
+            let patientOptions = patients.map(p => `<option value="${p.name}" ${p.name === data.patientName ? 'selected' : ''}>${p.name}</option>`).join('');
+
+            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Schedule' : 'New Schedule';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="form-group"><label>Select Patient Name</label>
+                    <select id="s_name">${patientOptions || '<option value="">No Patients Added</option>'}</select>
+                </div>
+                <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="s_dt" value="${data.dateTime}"></div>
+                <div class="form-group"><label>Type / Status</label>
+                    <select id="s_stat">
+                        <option value="Scheduled" ${data.status === 'Scheduled' ? 'selected' : ''}>Scheduled</option>
+                        <option value="Follow-up" ${data.status === 'Follow-up' ? 'selected' : ''}>Follow-up Due</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Notes</label><input id="s_notes" value="${data.notes}"></div>`;
+            document.getElementById('modal-actions').innerHTML = `
+                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-full btn-save" onclick="saveData()">Save</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function openFeeModal(index = -1) {
+            currentType = 'fee';
+            editIndex = index;
+            let data = index >= 0 ? transactions[index] : { name: patients[0]?.name || '', type: 'Income', amount: '', due: 0 };
+
+            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Transaction' : 'Add Fee / Expense';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="form-group"><label>Patient Name / Expense Title</label><input id="f_name" value="${data.name}"></div>
+                <div class="form-group"><label>Transaction Type</label>
+                    <select id="f_type">
+                        <option value="Income" ${data.type === 'Income' ? 'selected' : ''}>Fee Collection (Income)</option>
+                        <option value="Expense" ${data.type === 'Expense' ? 'selected' : ''}>Clinic Expense</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Amount Paid (₹)</label><input type="number" id="f_amt" value="${data.amount}"></div>
+                <div class="form-group"><label>Pending Balance Due (₹)</label><input type="number" id="f_due" value="${data.due || 0}"></div>`;
+            document.getElementById('modal-actions').innerHTML = `
+                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-full btn-save" onclick="saveData()">Save</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function saveData() {
+            if (currentType === 'patient') {
+                let obj = { name: document.getElementById('p_name').value, condition: document.getElementById('p_cond').value, status: document.getElementById('p_stat').value };
+                if (editIndex >= 0) patients[editIndex] = obj; else patients.push(obj);
+            } 
+            else if (currentType === 'schedule') {
+                let obj = { patientName: document.getElementById('s_name').value, dateTime: document.getElementById('s_dt').value, status: document.getElementById('s_stat').value, notes: document.getElementById('s_notes').value };
+                if (editIndex >= 0) schedules[editIndex] = obj; else schedules.push(obj);
+            } 
+            else if (currentType === 'fee') {
+                let obj = { name: document.getElementById('f_name').value, type: document.getElementById('f_type').value, amount: Number(document.getElementById('f_amt').value), due: Number(document.getElementById('f_due').value) };
+                if (editIndex >= 0) transactions[editIndex] = obj; else transactions.push(obj);
+            }
+            closeModal();
+            updateDashboard();
+        }
+
+        function deletePatient(i) { patients.splice(i, 1); updateDashboard(); }
+        function deleteSchedule(i) { schedules.splice(i, 1); updateDashboard(); }
+        function deleteFee(i) { transactions.splice(i, 1); updateDashboard(); }
+
+        updateDashboard();
+    </script>
+</body>
+</html>
