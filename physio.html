@@ -303,7 +303,7 @@
 
 <!-- Modals Container -->
 <div id="proliv-dynamic-modals">
-  <!-- Patient Filter Modal (For Live/Total/Discharged Names) -->
+  <!-- Patient Filter Modal (For Live/Total/Discharged Names & Editing) -->
   <div id="patientFilterModal" class="proliv-modal">
     <div class="proliv-modal-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -363,7 +363,7 @@
             <input type="date" id="pStartDate">
           </div>
           <div class="proliv-form-group">
-            <label>End Date</label>
+            <label>End Date (Discharge Date)</label>
             <input type="date" id="pEndDate">
           </div>
         </div>
@@ -626,7 +626,7 @@
       saveData(); closeModals(); renderAllData();
     };
 
-    // Filter Popup for Patient Counts (Live, Total, Discharged)
+    // Filter Popup for Patient Counts (Live, Total, Discharged) with Direct Edit
     window.openPatientFilterModal = function(type) {
       const titleEl = document.getElementById("filterModalTitle");
       const listEl = document.getElementById("filteredPatientList");
@@ -643,16 +643,20 @@
       }
 
       listEl.innerHTML = filtered.length === 0 ? "<p style='color:#777; text-align:center;'>No patients found.</p>" : "";
-      filtered.forEach((p, originalIdx) => {
+      filtered.forEach((p) => {
         let actualIdx = window.patients.indexOf(p);
+        let statusBadgeColor = p.status === 'Discharged' ? 'color:#d32f2f;' : 'color:#4caf50;';
+        let dischargeInfo = p.status === 'Discharged' && p.endDate ? `<br><small style="color:#aaa;">Discharge Date: ${escapeHTML(p.endDate)}</small>` : '';
+        
         listEl.innerHTML += `
           <div class="card-item">
             <div style="flex:1; cursor:pointer;" onclick="closeModals(); editPatient(${actualIdx});">
-              <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; color:var(--text-muted);">(${escapeHTML(p.status || 'Live')})</span><br>
+              <strong>${escapeHTML(p.name)}</strong> <span style="font-size:11px; ${statusBadgeColor}">(${escapeHTML(p.status || 'Live')})</span><br>
               <small style="color:#aaa;">📞 ${escapeHTML(p.phone || 'N/A')} | 📍 ${escapeHTML(p.place || 'N/A')}</small>
+              ${dischargeInfo}
             </div>
             <div>
-              <button class="proliv-btn" style="padding:4px 8px; font-size:11px;" onclick="closeModals(); editPatient(${actualIdx});">Edit</button>
+              <button class="proliv-btn" style="padding:6px 10px; font-size:12px;" onclick="closeModals(); editPatient(${actualIdx});">Edit</button>
             </div>
           </div>
         `;
@@ -679,7 +683,7 @@
 
     window.editPatient = function(idx) {
       const p = window.patients[idx];
-      document.getElementById("patientModalTitle").textContent = "Edit Patient Details";
+      document.getElementById("patientModalTitle").textContent = "Edit Patient & Discharge Details";
       document.getElementById("pIndex").value = idx;
       document.getElementById("pName").value = p.name || "";
       document.getElementById("pPhone").value = p.phone || "";
