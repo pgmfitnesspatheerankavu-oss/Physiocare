@@ -14,7 +14,6 @@
             --pill-bg-red: #5f1414;
             --pill-bg-dark: #000000;
             --accent-green: #00e676;
-            --accent-orange: #ff9800;
         }
 
         * {
@@ -32,7 +31,7 @@
             padding-bottom: 90px;
         }
 
-        /* Top Navigation Header */
+        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -57,30 +56,14 @@
             font-weight: bold;
             font-size: 14px;
             color: #fff;
-            box-shadow: 0 0 10px rgba(211, 47, 47, 0.5);
         }
 
         .brand-title {
             font-size: 1.2rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
         }
 
-        .top-icons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .top-icon-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        /* 12 Dashboard Grid (3x4 Layout) */
+        /* 12 Dashboard Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -102,10 +85,7 @@
             cursor: pointer;
         }
 
-        .card-icon {
-            font-size: 1.3rem;
-            margin-bottom: 4px;
-        }
+        .card-icon { font-size: 1.3rem; margin-bottom: 4px; }
 
         .card-label {
             font-size: 0.65rem;
@@ -153,7 +133,7 @@
             align-items: center;
         }
 
-        /* One-by-One Patient Cards */
+        /* Patient Cards */
         .member-card {
             background-color: var(--card-bg);
             border-radius: 14px;
@@ -183,28 +163,10 @@
             border: 1px solid #3a3a3c;
         }
 
-        .member-details {
-            flex: 1;
-        }
-
-        .member-name {
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--text-main);
-            margin-bottom: 2px;
-        }
-
-        .member-sub {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-        }
-
-        .member-phone {
-            font-size: 0.82rem;
-            color: #29b6f6;
-            margin-top: 2px;
-            font-weight: 600;
-        }
+        .member-details { flex: 1; }
+        .member-name { font-size: 1rem; font-weight: bold; color: var(--text-main); margin-bottom: 2px; }
+        .member-sub { font-size: 0.75rem; color: var(--text-sub); }
+        .member-phone { font-size: 0.82rem; color: #29b6f6; margin-top: 2px; font-weight: 600; }
 
         .member-grid {
             background: #161618;
@@ -216,28 +178,10 @@
             gap: 8px;
         }
 
-        .mg-row {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .mg-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .mg-label {
-            color: var(--text-sub);
-            font-size: 0.68rem;
-        }
-
-        .mg-val {
-            font-weight: bold;
-            font-size: 0.82rem;
-            color: var(--text-main);
-            margin-top: 2px;
-        }
+        .mg-row { display: flex; justify-content: space-between; }
+        .mg-item { flex: 1; display: flex; flex-direction: column; }
+        .mg-label { color: var(--text-sub); font-size: 0.68rem; }
+        .mg-val { font-weight: bold; font-size: 0.82rem; color: var(--text-main); margin-top: 2px; }
 
         .member-actions {
             display: flex;
@@ -258,17 +202,8 @@
             cursor: pointer;
         }
 
-        .action-icon-btn span {
-            font-size: 0.95rem;
-        }
-
-        /* Generic Lists (Schedules & Fees) */
-        .data-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        /* Lists */
+        .data-list { display: flex; flex-direction: column; gap: 8px; }
         .list-item {
             background: var(--card-bg);
             border-radius: 10px;
@@ -277,17 +212,6 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid #2a2a2c;
-        }
-
-        .item-title {
-            font-size: 0.88rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .item-sub {
-            font-size: 0.75rem;
-            color: var(--text-sub);
         }
 
         .btn-sm {
@@ -345,24 +269,9 @@
             overflow-y: auto;
         }
 
-        .modal-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: var(--text-main);
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-        }
-
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
         .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
@@ -373,31 +282,23 @@
             font-size: 0.9rem;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 18px;
-        }
-
-        .btn-full {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-full { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
         .btn-save { background: var(--red-accent); color: #fff; }
         .btn-cancel { background: #3a3a3c; color: #fff; }
 
-        .detail-row {
+        /* Report View List Styling */
+        .report-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #2c2c2e;
-            font-size: 0.85rem;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a2c;
+            font-size: 0.88rem;
         }
+        .report-date { color: var(--text-sub); font-size: 0.78rem; width: 90px; }
+        .report-name { font-weight: 600; color: #ffffff; flex: 1; text-align: center; }
+        .report-val { font-weight: bold; color: var(--accent-green); width: 80px; text-align: right; }
     </style>
 </head>
 <body>
@@ -409,76 +310,76 @@
             <div class="brand-title">PROLIV PHYSIO</div>
         </div>
         <div class="top-icons">
-            <button class="top-icon-btn" onclick="openPatientModal()">👤+</button>
-            <button class="top-icon-btn" onclick="openPnlModal()">📈</button>
+            <button class="action-icon-btn" onclick="openPatientModal()"><span>👤+</span></button>
+            <button class="action-icon-btn" onclick="showReport('P&L')"><span>📈</span></button>
         </div>
     </div>
 
     <!-- 12 Dashboard Grid -->
     <div class="grid">
         <!-- Row 1 -->
-        <div class="card" onclick="scrollToSec('patients-sec')">
+        <div class="card" onclick="showReport('Live Patients')">
             <div class="card-icon">👥</div>
             <div class="card-label">Live Patients</div>
             <div class="pill-badge" id="val-activePatients">0</div>
         </div>
-        <div class="card" onclick="scrollToSec('patients-sec')">
+        <div class="card" onclick="showReport('Total Patients')">
             <div class="card-icon">🔍</div>
             <div class="card-label">Total Patients</div>
             <div class="pill-badge dark" id="val-totalPatients">0</div>
         </div>
-        <div class="card" onclick="scrollToSec('patients-sec')">
+        <div class="card" onclick="showReport('Discharged')">
             <div class="card-icon">👤❌</div>
             <div class="card-label">Discharged</div>
             <div class="pill-badge dark" id="val-dischargedCount">0</div>
         </div>
 
         <!-- Row 2 -->
-        <div class="card" onclick="scrollToSec('schedules-sec')">
+        <div class="card" onclick="showReport('Rehab')">
             <div class="card-icon">🕒</div>
             <div class="card-label">Rehab (1-3 Days)</div>
             <div class="pill-badge" id="val-rehabCount">0</div>
         </div>
-        <div class="card" onclick="scrollToSec('schedules-sec')">
+        <div class="card" onclick="showReport('Follow-up Due')">
             <div class="card-icon">⏰</div>
             <div class="card-label">Follow-up Due</div>
             <div class="pill-badge" id="val-followUpCount">0</div>
         </div>
-        <div class="card" onclick="scrollToSec('schedules-sec')">
+        <div class="card" onclick="showReport('Scheduled')">
             <div class="card-icon">📅</div>
             <div class="card-label">Scheduled</div>
             <div class="pill-badge dark" id="val-scheduledCount">0</div>
         </div>
 
         <!-- Row 3 -->
-        <div class="card" onclick="openPnlModal()">
+        <div class="card" onclick="showReport('Total Collection')">
             <div class="card-icon">💰</div>
             <div class="card-label">Total Collection</div>
             <div class="pill-badge green" id="val-totalCollection">₹0</div>
         </div>
-        <div class="card" onclick="scrollToSec('fees-sec')">
+        <div class="card" onclick="showReport('Due Amount')">
             <div class="card-icon">👛</div>
             <div class="card-label">Due Amount</div>
             <div class="pill-badge" id="val-dueAmount">₹0</div>
         </div>
-        <div class="card" onclick="openPnlModal()">
+        <div class="card" onclick="showReport('Total Expense')">
             <div class="card-icon">💸</div>
             <div class="card-label">Total Expense</div>
             <div class="pill-badge" id="val-totalExpense">₹0</div>
         </div>
 
-        <!-- Row 4 (New 3 Cards Added) -->
-        <div class="card" onclick="openPnlModal()">
+        <!-- Row 4 -->
+        <div class="card" onclick="showReport('P&L')">
             <div class="card-icon">📊</div>
             <div class="card-label">Net Profit</div>
             <div class="pill-badge green" id="val-netProfit">₹0</div>
         </div>
-        <div class="card" onclick="scrollToSec('schedules-sec')">
+        <div class="card" onclick="showReport('Scheduled')">
             <div class="card-icon">🗓️</div>
             <div class="card-label">Today's Sessions</div>
             <div class="pill-badge dark" id="val-todaySessions">0</div>
         </div>
-        <div class="card" onclick="scrollToSec('fees-sec')">
+        <div class="card" onclick="showReport('Total Collection')">
             <div class="card-icon">🧾</div>
             <div class="card-label">Total Entries</div>
             <div class="pill-badge dark" id="val-totalEntries">0</div>
@@ -512,23 +413,26 @@
     <!-- Modal Popup Form -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <div class="modal-title" id="modal-title">Edit Details</div>
+            <div class="modal-title" id="modal-title">Details</div>
             <div id="modal-body"></div>
             <div class="modal-actions" id="modal-actions">
-                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-full btn-save" onclick="saveData()">Save</button>
+                <button class="btn-full btn-cancel" onclick="closeModal()">Close</button>
             </div>
         </div>
     </div>
 
     <script>
         let patients = JSON.parse(localStorage.getItem('proliv_patients')) || [
-            { name: "Sudheesh", location: "Calicut", phone: "9876543210", plan: "Therapy", finalAmt: 350, paid: 330, due: 20, startDate: "Oct 27, 2026", endDate: "Nov 27, 2026", status: "Active" }
+            { name: "Sudheesh", location: "Calicut", phone: "9876543210", plan: "Therapy", finalAmt: 350, paid: 330, due: 20, startDate: "Oct 27, 2026", endDate: "Nov 27, 2026", status: "Active" },
+            { name: "Fathima hannath", location: "Calicut", phone: "6282944060", plan: "Basic Pack", finalAmt: 2000, paid: 2000, due: 0, startDate: "Oct 27, 2026", endDate: "Nov 25, 2026", status: "Active" },
+            { name: "Shyamjith", location: "Calicut", phone: "9496342522", plan: "Couple Pack", finalAmt: 3500, paid: 3500, due: 0, startDate: "Oct 27, 2026", endDate: "Jan 24, 2027", status: "Rehab" }
         ];
 
         let schedules = JSON.parse(localStorage.getItem('proliv_schedules')) || [];
         let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [
-            { name: "Sudheesh", type: "Income", amount: 330, due: 20, date: "Oct 27, 2026" }
+            { name: "Sudheesh", type: "Income", amount: 330, date: "Oct 27, 2026" },
+            { name: "Fathima hannath", type: "Income", amount: 2000, date: "Oct 27, 2026" },
+            { name: "Shyamjith", type: "Income", amount: 3500, date: "Oct 27, 2026" }
         ];
 
         let currentType = '';
@@ -545,7 +449,6 @@
             let totalDue = patients.reduce((a, b) => a + Number(b.due || 0), 0);
             let netProfit = totalIncome - totalExpense;
 
-            // Update 12 Dashboard Cards
             document.getElementById('val-activePatients').innerText = activePatients;
             document.getElementById('val-totalPatients').innerText = patients.length;
             document.getElementById('val-dischargedCount').innerText = discharged;
@@ -601,8 +504,8 @@
                 schedules.map((s, i) => `
                 <div class="list-item">
                     <div>
-                        <div class="item-title">${s.patientName}</div>
-                        <div class="item-sub">${s.dateTime} • ${s.notes}</div>
+                        <div style="font-weight:bold;">${s.patientName}</div>
+                        <div style="font-size:0.75rem; color:#888;">${s.dateTime} • ${s.notes}</div>
                     </div>
                     <div>
                         <button class="btn-sm btn-edit" onclick="openScheduleModal(${i})">Edit</button>
@@ -616,8 +519,8 @@
                 transactions.map((t, i) => `
                 <div class="list-item">
                     <div>
-                        <div class="item-title">${t.name}</div>
-                        <div class="item-sub">${t.type} • Paid: <b style="color:#00e676">₹${t.amount}</b> | Due: <b style="color:#ef5350">₹${t.due || 0}</b></div>
+                        <div style="font-weight:bold;">${t.name}</div>
+                        <div style="font-size:0.75rem; color:#888;">${t.type} • Paid: <b style="color:#00e676">₹${t.amount}</b></div>
                     </div>
                     <div>
                         <button class="btn-sm btn-edit" onclick="openFeeModal(${i})">Edit</button>
@@ -630,42 +533,62 @@
             localStorage.setItem('proliv_transactions', JSON.stringify(transactions));
         }
 
-        /* View Profile */
-        function viewPatientCard(i) {
-            let p = patients[i];
-            document.getElementById('modal-title').innerText = p.name + " Profile";
-            document.getElementById('modal-body').innerHTML = `
-                <div class="detail-row"><span>Location:</span><b>${p.location || 'Calicut'}</b></div>
-                <div class="detail-row"><span>Phone:</span><b>${p.phone}</b></div>
-                <div class="detail-row"><span>Plan:</span><b>${p.plan}</b></div>
-                <div class="detail-row"><span>Final Amount:</span><b>₹${p.finalAmt}</b></div>
-                <div class="detail-row"><span>Paid Amount:</span><b style="color:#00e676">₹${p.paid}</b></div>
-                <div class="detail-row"><span>Due Amount:</span><b style="color:#ef5350">₹${p.due}</b></div>
-            `;
+        /* Full Screen List Report (P&L Report Layout) */
+        function showReport(type) {
+            let title = type + " Report";
+            let listData = [];
+
+            if (type === 'Live Patients' || type === 'Total Patients' || type === 'Discharged' || type === 'Rehab') {
+                let filteredP = patients;
+                if (type === 'Live Patients') filteredP = patients.filter(p => p.status === 'Active');
+                else if (type === 'Discharged') filteredP = patients.filter(p => p.status === 'Discharged');
+                else if (type === 'Rehab') filteredP = patients.filter(p => p.status === 'Rehab');
+
+                listData = filteredP.map(p => ({
+                    date: p.startDate || "Oct 27, 2026",
+                    name: p.name,
+                    val: "₹" + p.paid
+                }));
+            } else if (type === 'Total Collection' || type === 'P&L') {
+                listData = transactions.map(t => ({
+                    date: t.date || "Oct 27, 2026",
+                    name: t.name,
+                    val: "₹" + t.amount
+                }));
+            } else if (type === 'Due Amount') {
+                listData = patients.filter(p => p.due > 0).map(p => ({
+                    date: p.startDate || "Oct 27, 2026",
+                    name: p.name,
+                    val: "₹" + p.due
+                }));
+            }
+
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerHTML = listData.length === 0 ? 
+                '<div style="text-align:center; padding:20px; color:#888;">റെക്കോർഡുകൾ ലഭ്യമല്ല</div>' :
+                listData.map(item => `
+                    <div class="report-row">
+                        <div class="report-date">${item.date}</div>
+                        <div class="report-name">${item.name}</div>
+                        <div class="report-val">${item.val}</div>
+                    </div>
+                `).join('');
+
             document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
             document.getElementById('modal').style.display = 'flex';
         }
 
-        /* P&L Modal */
-        function openPnlModal() {
-            let totalInc = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.amount), 0);
-            let totalExp = transactions.filter(t => t.type === 'Expense').reduce((a, b) => a + Number(b.amount), 0);
-            let net = totalInc - totalExp;
-
-            document.getElementById('modal-title').innerText = "P&L Report";
+        /* Patient Profile View */
+        function viewPatientCard(i) {
+            let p = patients[i];
+            document.getElementById('modal-title').innerText = p.name + " Profile";
             document.getElementById('modal-body').innerHTML = `
-                <div style="text-align:center; padding:10px; background:#2c2c2e; border-radius:10px; margin-bottom:12px;">
-                    <div style="font-size:0.8rem; color:#aaa;">Net Profit</div>
-                    <div style="font-size:1.4rem; font-weight:bold; color:${net >= 0 ? '#00e676' : '#ef5350'};">₹${net}</div>
-                    <div style="font-size:0.75rem; color:#888; margin-top:4px;">Collection: ₹${totalInc} | Expense: ₹${totalExp}</div>
-                </div>
-                ${transactions.map(t => `
-                    <div class="detail-row">
-                        <span style="color:#888;">${t.date || 'Oct 28, 2026'}</span>
-                        <b>${t.name}</b>
-                        <span style="color:${t.type === 'Income' ? '#00e676' : '#ef5350'}">₹${t.amount}</span>
-                    </div>
-                `).join('')}
+                <div class="report-row"><span>Location:</span><b>${p.location || 'Calicut'}</b></div>
+                <div class="report-row"><span>Phone:</span><b>${p.phone}</b></div>
+                <div class="report-row"><span>Plan:</span><b>${p.plan}</b></div>
+                <div class="report-row"><span>Final Amount:</span><b>₹${p.finalAmt}</b></div>
+                <div class="report-row"><span>Paid Amount:</span><b style="color:#00e676">₹${p.paid}</b></div>
+                <div class="report-row"><span>Due Amount:</span><b style="color:#ef5350">₹${p.due}</b></div>
             `;
             document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
             document.getElementById('modal').style.display = 'flex';
@@ -727,7 +650,6 @@
                     </select>
                 </div>
                 <div class="form-group"><label>Amount (₹)</label><input type="number" id="f_amt" value="${data.amount}"></div>
-                <div class="form-group"><label>Due (₹)</label><input type="number" id="f_due" value="${data.due || 0}"></div>
             `;
             document.getElementById('modal-actions').innerHTML = `
                 <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
@@ -765,7 +687,6 @@
                     name: document.getElementById('f_name').value,
                     type: document.getElementById('f_type').value,
                     amount: Number(document.getElementById('f_amt').value),
-                    due: Number(document.getElementById('f_due').value),
                     date: "Oct 29, 2026"
                 };
                 if (editIndex >= 0) transactions[editIndex] = obj; else transactions.unshift(obj);
@@ -777,10 +698,6 @@
         function deletePatient(i) { if(confirm("Delete patient?")) { patients.splice(i, 1); updateDashboard(); } }
         function deleteSchedule(i) { schedules.splice(i, 1); updateDashboard(); }
         function deleteFee(i) { transactions.splice(i, 1); updateDashboard(); }
-
-        function scrollToSec(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
 
         updateDashboard();
     </script>
