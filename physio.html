@@ -80,18 +80,70 @@
             cursor: pointer;
         }
 
-        /* Dashboard Grid */
-        .grid {
+        /* Section Title */
+        .section-header {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 18px 4px 10px 4px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Horizontal Scrollable Filter Chips */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            scrollbar-width: none;
+        }
+
+        .filter-chip {
+            background: var(--card-bg);
+            border: 1px solid #2a2a2c;
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #ccc;
+        }
+
+        .filter-chip.active {
+            background: #2a2a2c;
+            border-color: var(--red-accent);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .chip-badge {
+            background: #000;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* 3-Column Square Box Grid */
+        .grid-boxes {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .card {
+        .box-card {
             background-color: var(--card-bg);
             border-radius: 14px;
-            padding: 14px 6px;
+            padding: 12px 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -100,104 +152,53 @@
             min-height: 105px;
             border: 1px solid #2a2a2c;
             cursor: pointer;
+            position: relative;
         }
 
-        .card-icon {
-            font-size: 1.4rem;
-            margin-bottom: 6px;
-        }
-
-        .card-label {
-            font-size: 0.68rem;
-            color: #d1d1d6;
-            font-weight: 600;
-            line-height: 1.2;
-            margin-bottom: 8px;
-            height: 26px;
+        .box-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3a3a3c;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .box-title {
+            font-size: 0.72rem;
+            color: var(--text-main);
+            font-weight: bold;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .box-sub {
+            font-size: 0.62rem;
+            color: var(--text-sub);
+            margin-bottom: 6px;
         }
 
         .pill-badge {
             background-color: var(--pill-bg-red);
             color: #ff8a80;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            padding: 3px 12px;
-            border-radius: 12px;
-            min-width: 45px;
-        }
-
-        .pill-badge.dark {
-            background-color: var(--pill-bg-dark);
-            color: var(--text-main);
-            border: 1px solid #3a3a3c;
-        }
-
-        /* Section Lists */
-        .section-header {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin: 20px 4px 10px 4px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .data-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .list-item {
-            background: var(--card-bg);
+            padding: 2px 8px;
             border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #2a2a2c;
-            cursor: pointer;
         }
 
-        .item-info {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
+        .pill-badge.green {
+            background-color: #0d381e;
+            color: #00e676;
         }
-
-        .item-title {
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .item-sub {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-sm {
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.75rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btn-edit { background: #3a3a3c; color: #fff; }
-        .btn-del { background: #5f1414; color: #ff8a80; }
 
         /* Floating Action Button (FAB) */
         .fab {
@@ -219,7 +220,7 @@
             z-index: 99;
         }
 
-        /* Modal Styles */
+        /* Modal Popup */
         .modal {
             display: none;
             position: fixed;
@@ -288,7 +289,6 @@
         .btn-save { background: var(--red-accent); color: #fff; }
         .btn-cancel { background: #3a3a3c; color: #fff; }
 
-        /* Detail Modal Styling */
         .detail-row {
             display: flex;
             justify-content: space-between;
@@ -298,11 +298,31 @@
         }
         .detail-label { color: var(--text-sub); }
         .detail-val { font-weight: bold; color: var(--text-main); }
+
+        /* P&L Tabs */
+        .pnl-tabs {
+            display: flex;
+            border-bottom: 1px solid #3a3a3c;
+            margin-bottom: 12px;
+        }
+        .pnl-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+        .pnl-tab.active {
+            color: #fff;
+            font-weight: bold;
+            border-bottom: 2px solid var(--red-accent);
+        }
     </style>
 </head>
 <body>
 
-    <!-- Top Navigation Header -->
+    <!-- Top Bar -->
     <div class="top-bar">
         <div class="brand">
             <div class="brand-logo">P</div>
@@ -314,85 +334,51 @@
         </div>
     </div>
 
-    <!-- Dashboard Grid -->
-    <div class="grid">
-        <!-- Row 1 -->
-        <div class="card" onclick="showCardDetails('Live Patients')">
-            <div class="card-icon">👥</div>
-            <div class="card-label">Live Patients</div>
-            <div class="pill-badge" id="val-activePatients">0</div>
+    <!-- Dashboard Overview Grid -->
+    <div class="grid-boxes">
+        <div class="box-card" onclick="openPnlModal()">
+            <div style="font-size:1.2rem;">💰</div>
+            <div class="box-title">Total Collection</div>
+            <div class="pill-badge green" id="dash-collection">₹0</div>
         </div>
-        <div class="card" onclick="showCardDetails('Total Patients')">
-            <div class="card-icon">🔍</div>
-            <div class="card-label">Total Patients</div>
-            <div class="pill-badge dark" id="val-totalPatients">0</div>
+        <div class="box-card" onclick="openPnlModal()">
+            <div style="font-size:1.2rem;">💸</div>
+            <div class="box-title">Total Expense</div>
+            <div class="pill-badge" id="dash-expense">₹0</div>
         </div>
-        <div class="card" onclick="showCardDetails('Discharged')">
-            <div class="card-icon">👤❌</div>
-            <div class="card-label">Discharged</div>
-            <div class="pill-badge dark" id="val-dischargedCount">0</div>
-        </div>
-
-        <!-- Row 2 -->
-        <div class="card" onclick="showCardDetails('Rehab')">
-            <div class="card-icon">🕒</div>
-            <div class="card-label">Rehab (1-3 Days)</div>
-            <div class="pill-badge" id="val-rehabCount">0</div>
-        </div>
-        <div class="card" onclick="showCardDetails('Follow-up Due')">
-            <div class="card-icon">⏰</div>
-            <div class="card-label">Follow-up Due</div>
-            <div class="pill-badge" id="val-followUpCount">0</div>
-        </div>
-        <div class="card" onclick="showCardDetails('Scheduled')">
-            <div class="card-icon">📅</div>
-            <div class="card-label">Scheduled</div>
-            <div class="pill-badge dark" id="val-scheduledCount">0</div>
-        </div>
-
-        <!-- Row 3 -->
-        <div class="card" onclick="openPnlModal()">
-            <div class="card-icon">💰</div>
-            <div class="card-label">Total Collection</div>
-            <div class="pill-badge dark" id="val-totalCollection">₹0</div>
-        </div>
-        <div class="card" onclick="showCardDetails('Due Amount')">
-            <div class="card-icon">👛</div>
-            <div class="card-label">Due Amount</div>
-            <div class="pill-badge" id="val-dueAmount">₹0</div>
-        </div>
-        <div class="card" onclick="openPnlModal()">
-            <div class="card-icon">💸</div>
-            <div class="card-label">Total Expense</div>
-            <div class="pill-badge" id="val-totalExpense">₹0</div>
+        <div class="box-card" onclick="openPnlModal()">
+            <div style="font-size:1.2rem;">👛</div>
+            <div class="box-title">Due Amount</div>
+            <div class="pill-badge" id="dash-due">₹0</div>
         </div>
     </div>
 
-    <!-- Patients List -->
-    <div class="section-header" id="patients-sec">
-        <span>Patients List</span>
-        <button class="btn-sm btn-edit" onclick="openPatientModal()">+ Patient</button>
+    <!-- Patient Filter Chips -->
+    <div class="filter-chips">
+        <div class="filter-chip active" onclick="filterCategory('All', this)">All <span class="chip-badge" id="cnt-all">0</span></div>
+        <div class="filter-chip" onclick="filterCategory('Active', this)">Active <span class="chip-badge" id="cnt-active">0</span></div>
+        <div class="filter-chip" onclick="filterCategory('Rehab', this)">Rehab <span class="chip-badge" id="cnt-rehab">0</span></div>
+        <div class="filter-chip" onclick="filterCategory('Discharged', this)">Discharged <span class="chip-badge" id="cnt-discharged">0</span></div>
     </div>
-    <div class="data-list" id="patients-list"></div>
 
-    <!-- Schedules List -->
-    <div class="section-header" id="schedules-sec">
-        <span>Schedules & Rehab</span>
-        <button class="btn-sm btn-edit" onclick="openScheduleModal()">+ Schedule</button>
+    <!-- PATIENTS LIST (Box Grid Type) -->
+    <div class="section-header">
+        <span>PATIENT BOXES</span>
+        <button style="background:#3a3a3c; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:0.75rem;" onclick="openPatientModal()">+ Add</button>
     </div>
-    <div class="data-list" id="schedules-list"></div>
+    <div class="grid-boxes" id="patient-boxes"></div>
 
-    <!-- Fees & Accounts -->
-    <div class="section-header" id="fees-sec">
-        <span>Fees & Accounts (P&L)</span>
-        <button class="btn-sm btn-edit" onclick="openFeeModal()">+ Entry</button>
+    <!-- P&L / REVENUE BOXES (Box Grid Type) -->
+    <div class="section-header">
+        <span>P&L TRANSACTIONS</span>
+        <button style="background:#3a3a3c; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:0.75rem;" onclick="openFeeModal()">+ Entry</button>
     </div>
-    <div class="data-list" id="fees-list"></div>
+    <div class="grid-boxes" id="pnl-boxes"></div>
 
     <!-- Floating Action Button -->
     <button class="fab" onclick="openPatientModal()">+</button>
 
-    <!-- Modal Popup Form -->
+    <!-- Modal Popup -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-title" id="modal-title">Edit Details</div>
@@ -406,169 +392,131 @@
 
     <script>
         let patients = JSON.parse(localStorage.getItem('proliv_patients')) || [
-            { name: "Sudheesh", condition: "L5 Spine Therapy", status: "Rehab" }
-        ];
-        let schedules = JSON.parse(localStorage.getItem('proliv_schedules')) || [];
-        let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [
-            { name: "Sudheesh", type: "Income", amount: 330, due: 0, date: "Oct 28, 2026" }
+            { name: "Shyamjith", phone: "9496342522", plan: "Couple Pack", finalAmt: 3500, paid: 3500, due: 0, startDate: "Oct 27, 2026", endDate: "Jan 24, 2027", status: "Active" },
+            { name: "Fathima hannath", phone: "6282944060", plan: "Basic Pack", finalAmt: 2000, paid: 2000, due: 0, startDate: "Oct 27, 2026", endDate: "Nov 25, 2026", status: "Active" }
         ];
 
+        let transactions = JSON.parse(localStorage.getItem('proliv_transactions')) || [
+            { name: "Fathima hannath", type: "Income", amount: 2000, date: "Oct 27, 2026" },
+            { name: "Shifana", type: "Income", amount: 8000, date: "Oct 27, 2026" },
+            { name: "Rajesh Rajan", type: "Income", amount: 3500, date: "Oct 26, 2026" },
+            { name: "Anusree PM", type: "Income", amount: 2000, date: "Oct 26, 2026" }
+        ];
+
+        let activeFilter = 'All';
         let currentType = '';
         let editIndex = -1;
 
-        function updateDashboard() {
-            let activePatients = patients.filter(p => p.status === 'Active').length;
-            let discharged = patients.filter(p => p.status === 'Discharged').length;
-            let rehab = patients.filter(p => p.status === 'Rehab').length;
-            let followUp = schedules.filter(s => s.status === 'Follow-up').length;
-            
+        function updateUI() {
             let totalIncome = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.amount), 0);
             let totalExpense = transactions.filter(t => t.type === 'Expense').reduce((a, b) => a + Number(b.amount), 0);
-            let totalDue = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.due || 0), 0);
+            let totalDue = patients.reduce((a, b) => a + Number(b.due || 0), 0);
 
-            document.getElementById('val-activePatients').innerText = activePatients;
-            document.getElementById('val-totalPatients').innerText = patients.length;
-            document.getElementById('val-dischargedCount').innerText = discharged;
-            document.getElementById('val-rehabCount').innerText = rehab;
-            document.getElementById('val-followUpCount').innerText = followUp;
-            document.getElementById('val-scheduledCount').innerText = schedules.length;
+            document.getElementById('dash-collection').innerText = '₹' + totalIncome;
+            document.getElementById('dash-expense').innerText = '₹' + totalExpense;
+            document.getElementById('dash-due').innerText = '₹' + totalDue;
 
-            document.getElementById('val-totalCollection').innerText = '₹' + totalIncome;
-            document.getElementById('val-dueAmount').innerText = '₹' + totalDue;
-            document.getElementById('val-totalExpense').innerText = '₹' + totalExpense;
+            document.getElementById('cnt-all').innerText = patients.length;
+            document.getElementById('cnt-active').innerText = patients.filter(p => p.status === 'Active').length;
+            document.getElementById('cnt-rehab').innerText = patients.filter(p => p.status === 'Rehab').length;
+            document.getElementById('cnt-discharged').innerText = patients.filter(p => p.status === 'Discharged').length;
 
-            // Render Patients
-            let pList = document.getElementById('patients-list');
-            pList.innerHTML = patients.length === 0 ? '<div class="list-item"><span class="item-sub">രോഗികളുടെ വിവരങ്ങൾ ചേർത്തിട്ടില്ല</span></div>' :
-                patients.map((p, i) => `
-                <div class="list-item" onclick="viewPatientDetails(${i})">
-                    <div class="item-info">
-                        <span class="item-title">${p.name}</span>
-                        <span class="item-sub">${p.condition} • <b style="color:${p.status === 'Active' ? '#00e676' : '#ff9800'}">${p.status}</b></span>
-                    </div>
-                    <div class="item-actions" onclick="event.stopPropagation()">
-                        <button class="btn-sm btn-edit" onclick="openPatientModal(${i})">Edit</button>
-                        <button class="btn-sm btn-del" onclick="deletePatient(${i})">X</button>
-                    </div>
+            // Render Patient Box Cards
+            let pGrid = document.getElementById('patient-boxes');
+            let filteredP = activeFilter === 'All' ? patients : patients.filter(p => p.status === activeFilter);
+            pGrid.innerHTML = filteredP.length === 0 ? '<div style="grid-column: span 3; text-align:center; color:#666; font-size:0.8rem;">No Records</div>' :
+                filteredP.map((p, i) => `
+                <div class="box-card" onclick="viewPatientCard(${i})">
+                    <div class="box-avatar">${p.name.charAt(0)}</div>
+                    <div class="box-title">${p.name}</div>
+                    <div class="box-sub">${p.plan || 'Therapy'}</div>
+                    <div class="pill-badge ${p.due > 0 ? '' : 'green'}">${p.due > 0 ? 'Due: ₹'+p.due : 'Paid'}</div>
                 </div>`).join('');
 
-            // Render Schedules
-            let sList = document.getElementById('schedules-list');
-            sList.innerHTML = schedules.length === 0 ? '<div class="list-item"><span class="item-sub">ഷെഡ്യൂളുകൾ ഒന്നും നിലവിലില്ല</span></div>' :
-                schedules.map((s, i) => `
-                <div class="list-item">
-                    <div class="item-info">
-                        <span class="item-title">${s.patientName}</span>
-                        <span class="item-sub">${s.dateTime} • ${s.notes}</span>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn-sm btn-edit" onclick="openScheduleModal(${i})">Edit</button>
-                        <button class="btn-sm btn-del" onclick="deleteSchedule(${i})">X</button>
-                    </div>
-                </div>`).join('');
-
-            // Render Fees
-            let fList = document.getElementById('fees-list');
-            fList.innerHTML = transactions.length === 0 ? '<div class="list-item"><span class="item-sub">ഫീസ്/ചിലവ് രേഖപ്പെടുത്തിയിട്ടില്ല</span></div>' :
-                transactions.map((t, i) => `
-                <div class="list-item">
-                    <div class="item-info">
-                        <span class="item-title">${t.name}</span>
-                        <span class="item-sub">${t.type} • Paid: <b style="color:#00e676">₹${t.amount}</b> | Due: <b style="color:#ef5350">₹${t.due || 0}</b></span>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn-sm btn-edit" onclick="openFeeModal(${i})">Edit</button>
-                        <button class="btn-sm btn-del" onclick="deleteFee(${i})">X</button>
-                    </div>
+            // Render P&L Box Cards
+            let txGrid = document.getElementById('pnl-boxes');
+            txGrid.innerHTML = transactions.length === 0 ? '<div style="grid-column: span 3; text-align:center; color:#666; font-size:0.8rem;">No Transactions</div>' :
+                transactions.slice(0, 6).map((t, i) => `
+                <div class="box-card" onclick="openPnlModal()">
+                    <div style="font-size:1.1rem;">${t.type === 'Income' ? '💵' : '🧾'}</div>
+                    <div class="box-title">${t.name}</div>
+                    <div class="box-sub">${t.date || 'Oct 29'}</div>
+                    <div class="pill-badge ${t.type === 'Income' ? 'green' : ''}">₹${t.amount}</div>
                 </div>`).join('');
 
             localStorage.setItem('proliv_patients', JSON.stringify(patients));
-            localStorage.setItem('proliv_schedules', JSON.stringify(schedules));
             localStorage.setItem('proliv_transactions', JSON.stringify(transactions));
         }
 
-        /* View Patient Full Profile Popup */
-        function viewPatientDetails(index) {
-            let p = patients[index];
-            let pSchedules = schedules.filter(s => s.patientName === p.name);
-            let pTx = transactions.filter(t => t.name === p.name);
-            let totalPaid = pTx.reduce((a, b) => a + Number(b.amount), 0);
-            let totalDue = pTx.reduce((a, b) => a + Number(b.due || 0), 0);
+        function filterCategory(cat, el) {
+            activeFilter = cat;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            updateUI();
+        }
 
-            document.getElementById('modal-title').innerText = "Patient Details: " + p.name;
+        /* Full Details View Modal for Patient */
+        function viewPatientCard(index) {
+            let p = patients[index];
+            document.getElementById('modal-title').innerText = p.name;
             document.getElementById('modal-body').innerHTML = `
-                <div class="detail-row"><span class="detail-label">Name:</span><span class="detail-val">${p.name}</span></div>
-                <div class="detail-row"><span class="detail-label">Condition:</span><span class="detail-val">${p.condition}</span></div>
-                <div class="detail-row"><span class="detail-label">Status:</span><span class="detail-val" style="color:#00e676">${p.status}</span></div>
-                <div class="detail-row"><span class="detail-label">Total Fee Paid:</span><span class="detail-val" style="color:#00e676">₹${totalPaid}</span></div>
-                <div class="detail-row"><span class="detail-label">Pending Due:</span><span class="detail-val" style="color:#ef5350">₹${totalDue}</span></div>
-                <div style="margin-top:12px; font-weight:bold; font-size:0.8rem; color:var(--text-sub);">SCHEDULED SESSIONS:</div>
-                ${pSchedules.length === 0 ? '<div style="font-size:0.75rem; color:#666; margin-top:4px;">No upcoming sessions</div>' : 
-                  pSchedules.map(s => `<div class="detail-row"><span>${s.dateTime}</span><span>${s.notes}</span></div>`).join('')}
+                <div class="detail-row"><span class="detail-label">Contact:</span><span class="detail-val">${p.phone || 'N/A'}</span></div>
+                <div class="detail-row"><span class="detail-label">Plan/Treatment:</span><span class="detail-val">${p.plan || 'N/A'}</span></div>
+                <div class="detail-row"><span class="detail-label">Final Amount:</span><span class="detail-val">₹${p.finalAmt || 0}</span></div>
+                <div class="detail-row"><span class="detail-label">Paid Amount:</span><span class="detail-val" style="color:#00e676">₹${p.paid || 0}</span></div>
+                <div class="detail-row"><span class="detail-label">Pending Due:</span><span class="detail-val" style="color:#ef5350">₹${p.due || 0}</span></div>
+                <div class="detail-row"><span class="detail-label">Join Date:</span><span class="detail-val">${p.startDate || 'N/A'}</span></div>
+                <div class="detail-row"><span class="detail-label">End Date:</span><span class="detail-val">${p.endDate || 'N/A'}</span></div>
             `;
             document.getElementById('modal-actions').innerHTML = `
                 <button class="btn-full btn-cancel" onclick="closeModal()">Close</button>
-                <button class="btn-full btn-save" onclick="openPatientModal(${index})">Edit Profile</button>
+                <button class="btn-full btn-save" onclick="openPatientModal(${index})">Edit Details</button>
             `;
             document.getElementById('modal').style.display = 'flex';
         }
 
-        /* View P&L Report Modal */
+        /* P&L Report Screen Modal */
         function openPnlModal() {
-            let incomeTx = transactions.filter(t => t.type === 'Income');
-            let expenseTx = transactions.filter(t => t.type === 'Expense');
-            let totalInc = incomeTx.reduce((a, b) => a + Number(b.amount), 0);
-            let totalExp = expenseTx.reduce((a, b) => a + Number(b.amount), 0);
-            let net = totalInc - totalExp;
+            let totalInc = transactions.filter(t => t.type === 'Income').reduce((a, b) => a + Number(b.amount), 0);
+            let totalExp = transactions.filter(t => t.type === 'Expense').reduce((a, b) => a + Number(b.amount), 0);
+            let netProfit = totalInc - totalExp;
 
-            document.getElementById('modal-title').innerText = "P&L Report & Transactions";
+            document.getElementById('modal-title').innerText = "P&L Report";
             document.getElementById('modal-body').innerHTML = `
-                <div style="text-align:center; padding:10px; background:#2c2c2e; border-radius:10px; margin-bottom:12px;">
-                    <div style="font-size:0.8rem; color:#aaa;">Net Profit</div>
-                    <div style="font-size:1.4rem; font-weight:bold; color:${net >= 0 ? '#00e676' : '#ef5350'};">₹${net}</div>
-                    <div style="font-size:0.75rem; color:#888; margin-top:4px;">Collection: ₹${totalInc} | Expense: ₹${totalExp}</div>
+                <div style="text-align:center; margin-bottom:12px;">
+                    <div style="font-size:0.8rem; color:#aaa;">Net Profit: <b style="color:#fff;">₹${netProfit}</b> Total</div>
+                    <div style="font-size:0.75rem; color:#888; margin-top:2px;">Collection: ${totalInc} | Expense: ${totalExp}</div>
                 </div>
-                <div style="font-weight:bold; font-size:0.8rem; margin-bottom:6px; color:var(--text-sub);">INCOME / COLLECTION LOG</div>
-                ${incomeTx.map(t => `<div class="detail-row"><span>${t.name}</span><span style="color:#00e676">₹${t.amount}</span></div>`).join('')}
+                <div class="pnl-tabs">
+                    <div class="pnl-tab active">Collection</div>
+                </div>
+                ${transactions.map(t => `
+                    <div class="detail-row">
+                        <span style="color:#888;">${t.date || 'Oct 28, 2026'}</span>
+                        <span style="font-weight:bold;">${t.name}</span>
+                        <span style="color:${t.type === 'Income' ? '#00e676' : '#ef5350'}">${t.amount}</span>
+                    </div>
+                `).join('')}
             `;
             document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
             document.getElementById('modal').style.display = 'flex';
         }
 
-        /* Card Details View */
-        function showCardDetails(category) {
-            let filtered = [];
-            if(category === 'Live Patients') filtered = patients.filter(p => p.status === 'Active');
-            else if(category === 'Total Patients') filtered = patients;
-            else if(category === 'Discharged') filtered = patients.filter(p => p.status === 'Discharged');
-            else if(category === 'Rehab') filtered = patients.filter(p => p.status === 'Rehab');
-
-            document.getElementById('modal-title').innerText = category + " Overview";
-            document.getElementById('modal-body').innerHTML = filtered.length === 0 ? 
-                '<div style="color:#888; padding:10px 0;">റെക്കോർഡുകൾ ലഭ്യമല്ല</div>' :
-                filtered.map(p => `<div class="detail-row"><span>${p.name}</span><span style="color:#00e676">${p.condition}</span></div>`).join('');
-            
-            document.getElementById('modal-actions').innerHTML = `<button class="btn-full btn-cancel" onclick="closeModal()">Close</button>`;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        /* Modal Forms */
+        /* Forms */
         function openPatientModal(index = -1) {
             currentType = 'patient';
             editIndex = index;
-            let data = index >= 0 ? patients[index] : { name: '', condition: '', status: 'Active' };
+            let data = index >= 0 ? patients[index] : { name: '', phone: '', plan: '', finalAmt: '', paid: '', due: '', status: 'Active' };
 
             document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Patient' : 'Add New Patient';
             document.getElementById('modal-body').innerHTML = `
                 <div class="form-group"><label>Patient Name</label><input id="p_name" value="${data.name}"></div>
-                <div class="form-group"><label>Condition / Treatment</label><input id="p_cond" value="${data.condition}"></div>
-                <div class="form-group"><label>Status</label>
-                    <select id="p_stat">
-                        <option value="Active" ${data.status === 'Active' ? 'selected' : ''}>Active</option>
-                        <option value="Rehab" ${data.status === 'Rehab' ? 'selected' : ''}>Rehab (1-3 Days)</option>
-                        <option value="Discharged" ${data.status === 'Discharged' ? 'selected' : ''}>Discharged</option>
-                    </select>
-                </div>`;
+                <div class="form-group"><label>Contact Number</label><input id="p_phone" value="${data.phone}"></div>
+                <div class="form-group"><label>Plan / Condition</label><input id="p_plan" value="${data.plan}"></div>
+                <div class="form-group"><label>Final Amount (₹)</label><input type="number" id="p_amt" value="${data.finalAmt}"></div>
+                <div class="form-group"><label>Paid Amount (₹)</label><input type="number" id="p_paid" value="${data.paid}"></div>
+                <div class="form-group"><label>Due Amount (₹)</label><input type="number" id="p_due" value="${data.due}"></div>
+            `;
             document.getElementById('modal-actions').innerHTML = `
                 <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn-full btn-save" onclick="saveData()">Save</button>
@@ -576,48 +524,19 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function openScheduleModal(index = -1) {
-            currentType = 'schedule';
-            editIndex = index;
-            let data = index >= 0 ? schedules[index] : { patientName: patients[0]?.name || '', dateTime: '', notes: '', status: 'Scheduled' };
-            let patientOptions = patients.map(p => `<option value="${p.name}" ${p.name === data.patientName ? 'selected' : ''}>${p.name}</option>`).join('');
-
-            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Schedule' : 'New Schedule';
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Select Patient Name</label>
-                    <select id="s_name">${patientOptions || '<option value="">No Patients Added</option>'}</select>
-                </div>
-                <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="s_dt" value="${data.dateTime}"></div>
-                <div class="form-group"><label>Type / Status</label>
-                    <select id="s_stat">
-                        <option value="Scheduled" ${data.status === 'Scheduled' ? 'selected' : ''}>Scheduled</option>
-                        <option value="Follow-up" ${data.status === 'Follow-up' ? 'selected' : ''}>Follow-up Due</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Notes</label><input id="s_notes" value="${data.notes}"></div>`;
-            document.getElementById('modal-actions').innerHTML = `
-                <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-full btn-save" onclick="saveData()">Save</button>
-            `;
-            document.getElementById('modal').style.display = 'flex';
-        }
-
-        function openFeeModal(index = -1) {
+        function openFeeModal() {
             currentType = 'fee';
-            editIndex = index;
-            let data = index >= 0 ? transactions[index] : { name: patients[0]?.name || '', type: 'Income', amount: '', due: 0 };
-
-            document.getElementById('modal-title').innerText = index >= 0 ? 'Edit Transaction' : 'Add Fee / Expense';
+            document.getElementById('modal-title').innerText = 'Add Transaction';
             document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Patient Name / Expense Title</label><input id="f_name" value="${data.name}"></div>
-                <div class="form-group"><label>Transaction Type</label>
+                <div class="form-group"><label>Patient Name / Expense Title</label><input id="f_name"></div>
+                <div class="form-group"><label>Type</label>
                     <select id="f_type">
-                        <option value="Income" ${data.type === 'Income' ? 'selected' : ''}>Fee Collection (Income)</option>
-                        <option value="Expense" ${data.type === 'Expense' ? 'selected' : ''}>Clinic Expense</option>
+                        <option value="Income">Collection (Income)</option>
+                        <option value="Expense">Clinic Expense</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Amount Paid (₹)</label><input type="number" id="f_amt" value="${data.amount}"></div>
-                <div class="form-group"><label>Pending Balance Due (₹)</label><input type="number" id="f_due" value="${data.due || 0}"></div>`;
+                <div class="form-group"><label>Amount (₹)</label><input type="number" id="f_amt"></div>
+            `;
             document.getElementById('modal-actions').innerHTML = `
                 <button class="btn-full btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn-full btn-save" onclick="saveData()">Save</button>
@@ -629,26 +548,31 @@
 
         function saveData() {
             if (currentType === 'patient') {
-                let obj = { name: document.getElementById('p_name').value, condition: document.getElementById('p_cond').value, status: document.getElementById('p_stat').value };
+                let obj = {
+                    name: document.getElementById('p_name').value,
+                    phone: document.getElementById('p_phone').value,
+                    plan: document.getElementById('p_plan').value,
+                    finalAmt: Number(document.getElementById('p_amt').value),
+                    paid: Number(document.getElementById('p_paid').value),
+                    due: Number(document.getElementById('p_due').value),
+                    startDate: "Oct 29, 2026",
+                    status: "Active"
+                };
                 if (editIndex >= 0) patients[editIndex] = obj; else patients.push(obj);
-            } 
-            else if (currentType === 'schedule') {
-                let obj = { patientName: document.getElementById('s_name').value, dateTime: document.getElementById('s_dt').value, status: document.getElementById('s_stat').value, notes: document.getElementById('s_notes').value };
-                if (editIndex >= 0) schedules[editIndex] = obj; else schedules.push(obj);
-            } 
-            else if (currentType === 'fee') {
-                let obj = { name: document.getElementById('f_name').value, type: document.getElementById('f_type').value, amount: Number(document.getElementById('f_amt').value), due: Number(document.getElementById('f_due').value) };
-                if (editIndex >= 0) transactions[editIndex] = obj; else transactions.push(obj);
+            } else if (currentType === 'fee') {
+                let obj = {
+                    name: document.getElementById('f_name').value,
+                    type: document.getElementById('f_type').value,
+                    amount: Number(document.getElementById('f_amt').value),
+                    date: "Oct 29, 2026"
+                };
+                transactions.unshift(obj);
             }
             closeModal();
-            updateDashboard();
+            updateUI();
         }
 
-        function deletePatient(i) { patients.splice(i, 1); updateDashboard(); }
-        function deleteSchedule(i) { schedules.splice(i, 1); updateDashboard(); }
-        function deleteFee(i) { transactions.splice(i, 1); updateDashboard(); }
-
-        updateDashboard();
+        updateUI();
     </script>
 </body>
 </html>
